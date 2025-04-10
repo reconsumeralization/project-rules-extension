@@ -23,7 +23,26 @@ const path = require('path')
 const glob = require('glob')
 const parser = require('@babel/parser')
 const traverse = require('@babel/traverse').default
-const chalk = require('chalk')
+
+// Chalk v5+ is ESM only, fallback to basic console colors
+function colorize(text, color) {
+  const colors = {
+    blue: '\x1b[34m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    red: '\x1b[31m',
+    reset: '\x1b[0m'
+  }
+  return `${colors[color] || ''}${text}${colors.reset}`
+}
+
+// Create chalk-like interface
+const chalk = {
+  blue: (text) => colorize(text, 'blue'),
+  green: (text) => colorize(text, 'green'),
+  yellow: (text) => colorize(text, 'yellow'),
+  red: (text) => colorize(text, 'red')
+}
 
 // Default configuration
 const config = {

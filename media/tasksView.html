@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cursor Rules Task Manager - Manage tasks related to your rules">
+    <title>MCP Tasks Manager</title>
+    <link rel="stylesheet" href="codicon.css">
+    <link rel="stylesheet" href="tasksView.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>MCP Tasks Manager</h1>
+            <button id="addTaskBtn" class="btn btn-primary">
+                <i class="fas fa-plus mr-sm"></i> New Task
+            </button>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="searchInput">Search</label>
+                <input type="text" id="searchInput" placeholder="Search tasks..." class="search-input">
+            </div>
+            <div class="filter-group">
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="blocked">Blocked</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="priorityFilter">Priority</label>
+                <select id="priorityFilter">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="assigneeFilter">Assignee</label>
+                <select id="assigneeFilter">
+                    <option value="all">All Assignees</option>
+                    <option value="unassigned">Unassigned</option>
+                    <!-- Will be populated dynamically -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="ruleLinkFilter">Related Rule</label>
+                <select id="ruleLinkFilter">
+                    <option value="all">All Rules</option>
+                    <option value="no-rule">No Rule</option>
+                    <!-- Will be populated dynamically -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="sortBy">Sort By</label>
+                <select id="sortBy">
+                    <option value="updatedAt-desc">Last Updated</option>
+                    <option value="createdAt-desc">Date Created</option>
+                    <option value="dueDate-asc">Due Date</option>
+                    <option value="title-asc">Title A-Z</option>
+                    <option value="priority-desc">Priority</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="tasksContainer" class="tasks-container">
+            <!-- Tasks will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">New Task</h2>
+                <button id="closeTaskModal" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select id="priority" required>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="assignee">Assignee</label>
+                            <input type="text" id="assignee" placeholder="Enter name or email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input type="date" id="dueDate">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="relatedRuleId">Related Rule</label>
+                        <select id="relatedRuleId">
+                            <option value="">None</option>
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="deleteTaskBtn" class="btn btn-danger">Delete</button>
+                </div>
+                <div class="btn-row">
+                    <button id="cancelTaskBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="saveTaskBtn" class="btn btn-primary">Save Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button id="closeDeleteModal" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Templates -->
+    <template id="taskCardTemplate">
+        <div class="task-card" data-id="">
+            <div class="task-header">
+                <h3 class="task-title"></h3>
+                <div class="task-priority"></div>
+            </div>
+            <div class="task-content">
+                <p class="task-description"></p>
+            </div>
+            <div class="task-footer">
+                <div class="task-info">
+                    <span class="task-status"></span>
+                    <span class="task-due-date"><i class="fas fa-calendar-alt mr-sm"></i></span>
+                    <span class="task-assignee"><i class="fas fa-user mr-sm"></i></span>
+                </div>
+                <div class="task-meta">
+                    <span class="task-related-rule"><i class="fas fa-link mr-sm"></i></span>
+                </div>
+                <div class="task-status-buttons">
+                    <button class="status-btn" data-status="pending">Pending</button>
+                    <button class="status-btn" data-status="in-progress">In Progress</button>
+                    <button class="status-btn" data-status="completed">Completed</button>
+                    <button class="status-btn" data-status="blocked">Blocked</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="emptyStateTemplate">
+        <div class="empty-state">
+            <i class="fas fa-tasks fa-3x mb-md"></i>
+            <h2>No Tasks Found</h2>
+            <p>Get started by creating your first task or adjust your filters to see more results.</p>
+            <button id="emptyStateAddBtn" class="btn btn-primary">
+                <i class="fas fa-plus mr-sm"></i> Create Task
+            </button>
+        </div>
+    </template>
+
+    <script src="tasksView.js"></script>
+</body>
+</html> 

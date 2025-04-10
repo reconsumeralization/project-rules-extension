@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Context Protocol Rules Manager - Configure how your AI assistant behaves">
+    <title>MCP Rules Manager</title>
+    <link rel="stylesheet" href="codicon.css">
+    <link rel="stylesheet" href="rulesView.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <h1>MCP Rules Manager</h1>
+                <span class="badge">Beta</span>
+            </div>
+            <div class="header-actions">
+                <button id="importButton" class="button-secondary" title="Import rules from JSON">
+                    <i class="codicon codicon-cloud-download"></i> Import
+                </button>
+                <button id="exportButton" class="button-secondary" title="Export rules to JSON">
+                    <i class="codicon codicon-cloud-upload"></i> Export
+                </button>
+                <button id="syncButton" class="button-secondary" disabled title="Synchronize rules with cloud">
+                    <i class="codicon codicon-sync"></i> Sync
+                </button>
+                <button id="createRuleButton" class="button-primary">
+                    <i class="codicon codicon-add"></i> New Rule
+                </button>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <span class="stat-value" id="totalRules">-</span>
+                    <span class="stat-label">Total Rules</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="activeRules">-</span>
+                    <span class="stat-label">Active Rules</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="lastSync">-</span>
+                    <span class="stat-label">Last Synced</span>
+                </div>
+            </div>
+            
+            <div class="description">
+                <p>Configure how your AI assistant behaves in specific contexts with Model Context Protocol rules.</p>
+                <p class="hint">Rules are applied automatically based on your workspace and active files.</p>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="search-container">
+                <i class="codicon codicon-search"></i>
+                <input type="text" id="searchRules" placeholder="Search rules..." class="search-input">
+            </div>
+            <div class="filter-options">
+                <select id="filterStatus" class="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <select id="filterType" class="filter-select">
+                    <option value="all">All Types</option>
+                    <option value="global">Global</option>
+                    <option value="language">Language</option>
+                    <option value="project">Project</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="rulesList" class="rules-list">
+            <div class="loading-placeholder">
+                <div class="spinner"></div>
+                <span>Loading rules...</span>
+            </div>
+        </div>
+        
+        <div id="emptyState" class="empty-state hidden">
+            <i class="codicon codicon-notebook"></i>
+            <h3>No rules found</h3>
+            <p>Create your first rule to enhance your AI assistant's context awareness</p>
+            <button id="emptyStateCreateButton" class="button-primary">
+                <i class="codicon codicon-add"></i> Create First Rule
+            </button>
+        </div>
+    </div>
+    
+    <template id="ruleCardTemplate">
+        <div class="rule-card" data-rule-id="">
+            <div class="rule-header">
+                <div class="rule-title-area">
+                    <span class="rule-type-badge"></span>
+                    <h3 class="rule-title"></h3>
+                </div>
+                <div class="rule-actions">
+                    <label class="toggle-switch">
+                        <input type="checkbox" class="rule-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <button class="icon-button edit-rule" title="Edit rule">
+                        <i class="codicon codicon-edit"></i>
+                    </button>
+                    <button class="icon-button delete-rule" title="Delete rule">
+                        <i class="codicon codicon-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="rule-content">
+                <p class="rule-description"></p>
+                <div class="rule-triggers"></div>
+            </div>
+            <div class="rule-footer">
+                <span class="rule-modified">Last modified: <time></time></span>
+            </div>
+        </div>
+    </template>
+    
+    <script src="rulesView.js"></script>
+</body>
+</html>

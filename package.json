@@ -1,0 +1,335 @@
+{
+  "name": "project-rules-extension",
+  "displayName": "Project Rules",
+  "description": "Manage and enforce project-specific rules and conventions",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "projectRules.testCommand",
+        "title": "Test Extension Activation",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.suggestRuleImprovements",
+        "title": "Project Rules: Suggest Rule Improvements",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.fetchServerChanges",
+        "title": "Fetch Latest Rules From Server",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.createRule",
+        "title": "Create New Rule",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.syncRules",
+        "title": "Sync Rules",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.generateRuleFromFile",
+        "title": "Generate Rule From This File",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.createTask",
+        "title": "Create Task",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.createTaskWithAI",
+        "title": "Create Task Using AI",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.generateTasksForRule",
+        "title": "Generate Tasks For Rule",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.showTasks",
+        "title": "Show Tasks View",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.showTasksForRule",
+        "title": "Show Tasks for This Rule",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.openMcpAgentsView",
+        "title": "Show MCP Server Agents",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.refreshMcpAgents",
+        "title": "Refresh MCP Server Agents",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.refreshAgentStats",
+        "title": "Refresh Agent Statistics",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.refreshAllAgentStats",
+        "title": "Refresh Statistics for ALL Agents",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.approveSuggestedRule",
+        "title": "Approve AI Suggested Rule",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.dismissSuggestedRule",
+        "title": "Dismiss AI Suggested Rule",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.previewSuggestion",
+        "title": "Preview AI Suggested Rule",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.toggleAiAutonomy",
+        "title": "Toggle AI Autonomy On/Off",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.triggerAiCycle",
+        "title": "Manually Trigger AI Autonomy Cycle",
+        "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.assignTaskToMe",
+        "title": "Assign to Me",
+        "category": "Project Rules (Tasks)"
+      },
+      {
+        "command": "projectRules.estimateTaskComplexity",
+        "title": "Estimate Task Complexity",
+        "category": "Project Rules (Tasks)",
+        "icon": "$(symbol-numeric)"
+      }
+    ],
+    "configuration": {
+      "title": "Project Rules",
+      "properties": {
+        "projectRules.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "URL of the Project Rules server used for synchronization and AI features."
+        },
+        "projectRules.authToken": {
+          "type": "string",
+          "default": "",
+          "description": "Authentication token (Bearer) for accessing the Project Rules server API.",
+          "markdownDescription": "Authentication token (Bearer) for accessing the Project Rules server API. Leave blank if no authentication is required."
+        },
+        "projectRules.syncInterval": {
+          "type": "number",
+          "default": 300,
+          "description": "Interval in seconds for background rule synchronization (e.g., 300 for 5 minutes). Set to 0 to disable automatic background sync."
+        },
+        "projectRules.mcpAgents.autoRefreshOnFocus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh MCP Agent statistics when the VS Code window gains focus."
+        },
+        "projectRules.ai.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API Key for the selected AI service (if required). Leave empty to use VS Code's built-in provider if available."
+        },
+        "projectRules.ai.context.maxFileChars": {
+          "type": "number",
+          "default": 2000,
+          "description": "Maximum characters to include directly from a file for context before attempting summarization."
+        },
+        "projectRules.ai.context.enableSummarization": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered summarization for file context exceeding the character limit. If false, content will be truncated."
+        },
+        "projectRules.ai.context.maxFiles": {
+          "type": "number",
+          "default": 5,
+          "description": "Maximum number of relevant files to include context from during task execution."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "projectRules",
+          "title": "Project Rules",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "projectRules": [
+        {
+          "id": "projectRules.rulesView",
+          "name": "Project Rules"
+        },
+        {
+          "id": "projectRules.tasksView",
+          "name": "Tasks"
+        },
+        {
+          "id": "projectRules.mcpAgentsView",
+          "name": "MCP Server Agents"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "projectRules.approveSuggestedRule",
+          "when": "view == projectRules.rulesView && viewItem == aiSuggestion",
+          "group": "inline@1"
+        },
+        {
+          "command": "projectRules.dismissSuggestedRule",
+          "when": "view == projectRules.rulesView && viewItem == aiSuggestion",
+          "group": "inline@2"
+        },
+        {
+          "command": "projectRules.assignTaskToMe",
+          "when": "view == projectRules.tasksView && viewItem == task",
+          "group": "2_actions@1"
+        },
+        {
+          "command": "projectRules.estimateTaskComplexity",
+          "when": "view == projectRules.tasksView && viewItem == task",
+          "group": "2_actions@2"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "projectRules.createRule",
+          "when": "view == projectRules.rulesView",
+          "group": "navigation"
+        },
+        {
+          "command": "projectRules.syncRules",
+          "when": "view == projectRules.rulesView",
+          "group": "navigation"
+        },
+        {
+          "command": "projectRules.fetchServerChanges",
+          "when": "view == projectRules.rulesView",
+          "group": "navigation"
+        },
+        {
+          "command": "projectRules.refreshMcpAgents",
+          "when": "view == projectRules.mcpAgentsView",
+          "group": "navigation"
+        },
+        {
+          "command": "projectRules.refreshAgentStats",
+          "when": "view == projectRules.mcpAgentsView",
+          "group": "navigation"
+        },
+        {
+          "command": "projectRules.refreshAllAgentStats",
+          "when": "view == projectRules.mcpAgentsView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "projectRules.createTask",
+          "when": "view == projectRules.tasksView",
+          "group": "navigation"
+        },
+        {
+          "command": "projectRules.createTaskWithAI",
+          "when": "view == projectRules.tasksView",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "projectRules.generateRuleFromFile",
+          "when": "editorHasSelection || !editorHasSelection",
+          "group": "projectRules@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "projectRules.suggestRuleImprovements",
+          "when": "resourceLangId == markdown && resourceFilename =~ /\\.mdc$/",
+          "group": "navigation@1"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.35"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.0.0",
+    "webpack": "^5.99.5",
+    "webpack-cli": "^6.0.1",
+    "@radix-ui/react-dialog": "^1.1.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-label": "^2.1.3",
+    "@radix-ui/react-slot": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "lucide-react": "^0.487.0",
+    "next-themes": "^0.4.6",
+    "react-hook-form": "^7.55.0",
+    "sonner": "^2.0.3",
+    "vaul": "^1.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
+    "file-loader": "^6.2.0"
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "package": "webpack --mode production --devtool hidden-source-map"
+  },
+  "keywords": [
+    "rules",
+    "conventions",
+    "documentation",
+    "code-quality",
+    "ai",
+    "mcp",
+    "task-management",
+    "team-collaboration"
+  ],
+  "author": "reconsumeralization <reconsumeralization@github.com>",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reconsumeralization/project-rules-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/reconsumeralization/project-rules-extension/issues"
+  },
+  "homepage": "https://github.com/reconsumeralization/project-rules-extension#readme"
+}

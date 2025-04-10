@@ -1,0 +1,959 @@
+/* Add these styles to the existing styles.css file */
+
+/* Task View Styles */
+.tasks-view {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    color: var(--vscode-foreground);
+    background-color: var(--vscode-editor-background);
+    font-family: var(--vscode-font-family);
+    padding: 16px;
+    overflow-x: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 20px;
+    animation: text-glitch 15s infinite linear;
+}
+
+.header-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+}
+
+.search-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--vscode-input-border);
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border-radius: 2px;
+}
+
+.filters {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group select {
+    padding: 6px 8px;
+    background-color: var(--vscode-dropdown-background);
+    color: var(--vscode-dropdown-foreground);
+    border: 1px solid var(--vscode-dropdown-border);
+    border-radius: 2px;
+}
+
+.tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.task-card {
+    padding: 12px;
+    background-color: var(--vscode-editor-inactiveSelectionBackground);
+    border-radius: 4px;
+    border-left: 4px solid transparent;
+    position: relative;
+    padding-bottom: 8px;
+    box-shadow: 0 0 5px rgba(57, 255, 20, 0.2);
+    transition: box-shadow var(--transition-speed) var(--transition-timing), 
+                transform var(--transition-speed) var(--transition-timing);
+    border: 1px solid var(--neon-green);
+    border-left-width: 4px;
+    border-left-color: var(--neon-green);
+    animation: border-pulse-anim 3s infinite linear;
+}
+
+.task-card.priority-high {
+    border-left-color: var(--vscode-errorForeground);
+}
+
+.task-card.priority-medium {
+    border-left-color: var(--vscode-editorWarning-foreground);
+}
+
+.task-card.priority-low {
+    border-left-color: var(--vscode-editorInfo-foreground);
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+}
+
+.task-title {
+    font-weight: 600;
+    margin: 0;
+    margin-right: 8px;
+    word-break: break-word;
+}
+
+.task-card-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.task-card-actions .task-action-btn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--vscode-icon-foreground);
+    opacity: 0.7;
+    border-radius: 3px;
+    transition: opacity var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    line-height: 1;
+}
+
+.task-card-actions .task-action-btn:hover {
+    opacity: 1;
+    background-color: rgba(57, 255, 20, 0.15);
+    color: #fff;
+    transform: scale(1.1);
+    transition: opacity var(--transition-speed) ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.task-card-actions .task-action-btn .codicon {
+    font-size: 14px;
+}
+
+.task-status {
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    background-color: transparent;
+    text-shadow: 0 0 2px var(--neon-green);
+    transition: color var(--transition-speed) var(--transition-timing), 
+                border-color var(--transition-speed) var(--transition-timing), 
+                text-shadow var(--transition-speed) var(--transition-timing), 
+                opacity var(--transition-speed) var(--transition-timing);
+}
+
+.task-status.status-pending {
+    background-color: var(--vscode-statusBarItem-warningBackground);
+    color: var(--vscode-statusBarItem-warningForeground);
+}
+
+.task-status.status-in-progress {
+    background-color: var(--vscode-debugIcon-breakpointForeground);
+    animation: neon-pulse 1.8s infinite alternate;
+}
+
+.task-status.status-completed {
+    background-color: var(--vscode-terminal-ansiGreen);
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.task-status.status-blocked {
+    background-color: var(--vscode-statusBarItem-errorBackground);
+    color: var(--vscode-statusBarItem-errorForeground);
+    border-color: var(--danger-red);
+}
+
+.task-status.pending {
+    background-color: var(--vscode-progressBar-background);
+}
+
+.task-status.completed {
+    background-color: var(--vscode-terminal-ansiGreen);
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.task-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--vscode-foreground);
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.task-action-btn:hover {
+    opacity: 1;
+}
+
+.task-details {
+    margin-top: 8px;
+}
+
+.task-description {
+    margin: 0 0 8px 0;
+    color: var(--vscode-descriptionForeground);
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    border-top: 1px solid var(--vscode-editorWidget-border);
+    padding-top: 8px;
+}
+
+.task-meta span[title] {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.task-meta .codicon {
+    font-size: 14px;
+}
+
+.task-priority.priority-high .codicon {
+    color: var(--vscode-errorForeground);
+}
+
+.task-priority.priority-medium .codicon {
+    color: var(--vscode-editorWarning-foreground);
+}
+
+.task-priority.priority-low .codicon {
+    color: var(--vscode-editorInfo-foreground);
+}
+
+.task-status-buttons {
+    display: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 24px;
+    color: var(--vscode-descriptionForeground);
+}
+
+/* Task Form Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--vscode-editor-background);
+    width: 90%;
+    max-width: 500px;
+    border-radius: 4px;
+    border: 1px solid var(--vscode-widget-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--vscode-widget-border);
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 16px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--vscode-foreground);
+    font-size: 18px;
+    opacity: 0.7;
+}
+
+.modal-close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 2px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.primary-btn {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+
+.secondary-btn {
+    background-color: transparent;
+    color: var(--vscode-foreground);
+    border: 1px solid var(--vscode-button-border);
+    padding: 6px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.danger-btn {
+    background-color: var(--vscode-errorForeground);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.danger-btn:hover {
+    opacity: 0.9;
+}
+
+/* Confirm Dialog */
+.confirm-dialog {
+    text-align: center;
+    padding: 16px;
+}
+
+.confirm-dialog p {
+    margin-bottom: 16px;
+}
+
+/* Add the agent statistics styles */
+
+/* Agents Stats styles */
+.agent-stats-summary {
+  margin: 8px 0;
+  background-color: var(--vscode-editor-inactiveSelectionBackground);
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+
+.stat-label {
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+}
+
+.stat-value {
+  font-weight: bold;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stats-header h3 {
+  margin: 0;
+}
+
+.refresh-stats-button {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  padding: 4px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.refresh-stats-button:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.refresh-stats-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.refresh-stats-button::before {
+  content: "$(graph)";
+  font-size: 14px;
+  font-family: 'codicon';
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.stat-box {
+  background-color: var(--vscode-input-background);
+  border-radius: 4px;
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-box .stat-value {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.stat-box .stat-label {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.stats-empty {
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  padding: 12px;
+  text-align: center;
+  background-color: var(--vscode-editor-inactiveSelectionBackground);
+  border-radius: 4px;
+}
+
+/* General View Controls */
+.view-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+/* Style buttons consistently */
+.view-controls button,
+.agent-actions button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: 1px solid var(--vscode-button-border, transparent);
+    padding: 6px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: var(--vscode-font-size);
+    transition: background-color 0.2s ease;
+}
+
+.view-controls button:hover,
+.agent-actions button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+
+.view-controls button:disabled,
+.agent-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--vscode-button-secondaryBackground);
+}
+
+/* Specific button styles if needed */
+#refresh-all-stats::before {
+    content: "$(sync)";
+    margin-right: 4px;
+}
+
+#refresh-agents::before {
+    content: "$(refresh)";
+    margin-right: 4px;
+}
+
+#create-agent-button::before,
+#create-agent::before {
+    content: "$(add)";
+    margin-right: 4px;
+}
+
+/* Ensure agent card actions use similar button styling */
+.agent-card .agent-actions button {
+   font-size: 12px;
+   padding: 4px 8px;
+}
+
+/* Styling for filter fieldsets */
+.filter-fieldset {
+    border: 1px solid var(--vscode-widget-border, #ccc);
+    border-radius: 4px;
+    padding: 8px 12px 12px 12px;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+}
+
+.filter-fieldset legend {
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--vscode-descriptionForeground);
+    background-color: var(--vscode-editor-background);
+}
+
+/* Ensure filter groups within fieldsets don't add extra margin */
+.filter-fieldset .filter-group {
+    margin-bottom: 0;
+}
+
+/* Adjust label styling slightly for Codicons */
+.filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+/* Ensure Codicons in labels have correct styling */
+.filter-group label .codicon {
+    font-size: 14px;
+    color: var(--vscode-icon-foreground);
+}
+
+/* Style for the error icon next to status */
+.task-status .task-error-icon {
+    /* Optional: Adjust vertical alignment if needed */
+    /* vertical-align: middle; */ 
+    font-size: 13px; /* Slightly smaller than meta text */
+}
+
+/* Hide old status buttons if they existed */
+
+/* styles.css */
+:root {
+  --neon-green: #39ff14; /* Intense neon green */
+  --dark-bg: #1a1a1a; /* Very dark background */
+  --dark-card-bg: #2a2a2a; /* Slightly lighter card background */
+  --light-text: #e0e0e0; /* Light text for contrast */
+  --medium-text: #a0a0a0; /* Medium text for secondary info */
+  --danger-red: #ff4d4d;
+  --warning-yellow: #ffd700;
+  --info-blue: #1e90ff;
+  --border-radius: 3px;
+  --neon-glow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green), 0 0 15px rgba(57, 255, 20, 0.5);
+  --danger-glow: 0 0 5px var(--danger-red), 0 0 10px var(--danger-red), 0 0 15px rgba(255, 77, 77, 0.5);
+  --transition-speed: 0.3s;
+  --transition-timing: ease-in-out;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  font-family: var(--vscode-font-family);
+  margin: 0;
+  padding: 0; /* Reset body padding */
+  position: relative; /* Needed for pseudo-element positioning */
+}
+
+/* Optional Background Texture */
+body::before {
+  content: '';
+  position: fixed; /* Fixed to cover viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px); /* Slightly more visible grid */
+  background-size: 4px 4px; /* Slightly larger grid */
+  opacity: 0.3; /* Very subtle */
+  z-index: -1; /* Behind everything */
+  pointer-events: none; /* Don't interfere with clicks */
+}
+
+/* Scanline Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh; 
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 9px, /* Line thickness + gap */
+    rgba(0, 0, 0, 0.2) 10px, /* Line thickness */
+    rgba(0, 0, 0, 0.2) 10px
+  );
+  opacity: 0.3;
+  z-index: 0; /* Above grid, below content */
+  pointer-events: none;
+  animation: scanline 0.5s linear infinite alternate; /* Adjust timing */
+}
+
+/* Adjust view padding if needed */
+.tasks-view {
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  padding: 16px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden; 
+  position: relative; /* Ensure view content is above pseudo-element */
+  z-index: 1;
+}
+
+.header h1 {
+  color: var(--light-text);
+  text-shadow: 0 0 5px var(--neon-green), 0 0 8px rgba(57, 255, 20, 0.5); /* Enhanced header glow */
+  animation: text-glitch 15s infinite linear; /* Apply infrequent glitch */
+}
+
+/* --- Neon Borders & Highlights --- */
+
+/* Inputs */
+input[type="text"],
+select,
+textarea {
+  background-color: var(--dark-card-bg);
+  color: var(--light-text);
+  border: 1px solid var(--neon-green);
+  border-radius: var(--border-radius);
+  padding: 6px 8px;
+  box-shadow: inset 0 0 3px rgba(57, 255, 20, 0.3);
+  transition: box-shadow var(--transition-speed) var(--transition-timing), border-color var(--transition-speed) var(--transition-timing);
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #8aff7a; /* Lighter green on focus */
+  box-shadow: var(--neon-glow);
+  animation: neon-pulse 2s infinite alternate;
+}
+
+/* Buttons */
+button,
+.primary-btn,
+.secondary-btn,
+.danger-btn,
+.view-controls button {
+  background-color: transparent;
+  color: var(--neon-green);
+  border: 1px solid var(--neon-green);
+  padding: 6px 12px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition-speed) var(--transition-timing), 
+              box-shadow var(--transition-speed) var(--transition-timing), 
+              color var(--transition-speed) var(--transition-timing);
+  font-weight: bold;
+  text-shadow: 0 0 2px var(--neon-green);
+}
+
+button:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.danger-btn:hover,
+.view-controls button:hover {
+  background-color: rgba(57, 255, 20, 0.15);
+  box-shadow: var(--neon-glow);
+  color: #fff;
+  text-shadow: 0 0 4px #fff;
+}
+
+button:disabled,
+.primary-btn:disabled,
+.secondary-btn:disabled,
+.danger-btn:disabled,
+.view-controls button:disabled {
+  border-color: #555;
+  color: #555;
+  cursor: not-allowed;
+  box-shadow: none;
+  text-shadow: none;
+  background-color: transparent;
+}
+
+/* Specific Button Styling */
+/* Removed empty .primary-btn and .secondary-btn rules */
+
+.danger-btn {
+  border-color: var(--danger-red);
+  color: var(--danger-red);
+  text-shadow: 0 0 2px var(--danger-red);
+}
+
+.danger-btn:hover {
+  background-color: rgba(255, 77, 77, 0.15);
+  box-shadow: var(--danger-glow);
+  color: #fff;
+  text-shadow: 0 0 4px #fff;
+}
+
+/* Task Cards */
+.task-card {
+  background-color: var(--dark-card-bg);
+  border: 1px solid var(--neon-green);
+  border-left-width: 4px; /* Keep thicker left border */
+  border-radius: var(--border-radius);
+  padding: 12px;
+  margin-bottom: 12px; /* Added for spacing */
+  box-shadow: 0 0 5px rgba(57, 255, 20, 0.2);
+  transition: box-shadow var(--transition-speed) var(--transition-timing), 
+              transform var(--transition-speed) var(--transition-timing), 
+              border-color var(--transition-speed) var(--transition-timing);
+  animation: border-pulse-anim 3s infinite linear;
+}
+
+.task-card:hover {
+    box-shadow: var(--neon-glow);
+    transform: translateY(-3px) scale(1.01);
+    animation-play-state: paused;
+    border-color: #8aff7a;
+}
+
+/* Remove default priority border colors, use neon green */
+.task-card.priority-high,
+.task-card.priority-medium,
+.task-card.priority-low {
+    border-left-color: var(--neon-green);
+}
+
+.task-title {
+  color: var(--light-text);
+  font-weight: 600;
+}
+
+.task-description {
+  color: var(--medium-text);
+  font-size: 0.9em;
+}
+
+.task-meta {
+  color: var(--medium-text);
+  font-size: 0.85em;
+}
+
+/* Status Labels */
+.task-status {
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    background-color: transparent;
+    padding: 2px 6px;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    text-shadow: 0 0 2px var(--neon-green);
+    transition: color var(--transition-speed) var(--transition-timing), 
+                border-color var(--transition-speed) var(--transition-timing), 
+                text-shadow var(--transition-speed) var(--transition-timing), 
+                opacity var(--transition-speed) var(--transition-timing);
+}
+
+/* Remove specific background colors for status */
+.task-status.status-pending,
+.task-status.status-in-progress,
+.task-status.status-completed,
+.task-status.status-blocked,
+.task-status.pending,
+.task-status.completed {
+    background-color: transparent;
+    /* Keep text decoration for completed */
+}
+
+.task-status.status-completed {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.task-status.status-blocked {
+    border-color: var(--danger-red);
+    color: var(--danger-red);
+    text-shadow: 0 0 2px var(--danger-red);
+}
+
+/* Error Icon */
+.task-status .task-error-icon {
+    color: var(--danger-red);
+    margin-left: 4px;
+    font-size: 13px;
+    vertical-align: middle; /* Align icon nicely */
+}
+
+/* Action Icons */
+.task-card-actions .task-action-btn {
+    color: var(--neon-green);
+    opacity: 0.8;
+    background: none;
+    border: none;
+}
+
+.task-card-actions .task-action-btn:hover {
+    opacity: 1;
+    background-color: rgba(57, 255, 20, 0.15);
+    color: #fff;
+}
+
+/* Scrollbar (Webkit) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--neon-green);
+  border-radius: 4px;
+  border: 2px solid var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #57ff33; /* Slightly brighter green on hover */
+}
+
+/* ... (keep other existing styles like modal, agent stats, etc., or apply theme there too) ... */
+
+/* Define pulsing animation */
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: var(--neon-glow);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 4px var(--neon-green), 0 0 8px var(--neon-green);
+    opacity: 0.9;
+  }
+}
+
+/* Define border animation */
+@keyframes border-pulse-anim {
+  0%, 100% {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 5px rgba(57, 255, 20, 0.2);
+  }
+  50% {
+    border-color: #8aff7a;
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+  }
+}
+
+/* Define scanline animation */
+@keyframes scanline {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px); /* Adjust distance for speed */
+  }
+}
+
+/* Define text glitch animation */
+@keyframes text-glitch {
+  0%, 100% {
+    opacity: 1;
+    transform: none;
+    text-shadow: 0 0 5px var(--neon-green), 0 0 8px rgba(57, 255, 20, 0.5);
+  }
+  2% { /* Brief glitches */
+    opacity: 0.8;
+    transform: translateX(2px);
+    text-shadow: 0 0 3px var(--danger-red), 0 0 5px rgba(255, 77, 77, 0.4);
+  }
+  4% {
+    opacity: 1;
+    transform: translateY(-1px);
+    text-shadow: 0 0 5px var(--neon-green), 0 0 8px rgba(57, 255, 20, 0.5);
+  }
+  6% {
+      opacity: 0.9;
+      transform: skewX(-5deg);
+      text-shadow: 0 0 4px var(--info-blue), 0 0 6px rgba(30, 144, 255, 0.4);
+  }
+  8% {
+      opacity: 1;
+      transform: none;
+      text-shadow: 0 0 5px var(--neon-green), 0 0 8px rgba(57, 255, 20, 0.5);
+  }
+} 

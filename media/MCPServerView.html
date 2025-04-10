@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server Output</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .server-output {
+            background-color: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .log-entry {
+            margin-bottom: 8px;
+        }
+        .timestamp {
+            color: #888;
+            margin-right: 10px;
+        }
+        .info {
+            color: #4a9cf5;
+        }
+        .warning {
+            color: #f5d04a;
+        }
+        .error {
+            color: #f55e5e;
+        }
+        .success {
+            color: #4af57e;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: normal;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-running {
+            background-color: #4af57e;
+        }
+        .status-stopped {
+            background-color: #f55e5e;
+        }
+        .server-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            padding: 15px;
+            border: 1px solid #444;
+        }
+        .stat-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="status-indicator status-running"></span>
+            MCP Server Output
+        </h1>
+        
+        <div class="server-stats">
+            <div class="stat-card">
+                <div class="stat-title">Uptime</div>
+                <div class="stat-value">3h 42m 15s</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Active Connections</div>
+                <div class="stat-value">24</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Memory Usage</div>
+                <div class="stat-value">512MB</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">MCPs Processed</div>
+                <div class="stat-value">1,245</div>
+            </div>
+        </div>
+        
+        <div class="server-output">
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:32:14]</span>
+                <span class="info">Server started on port 3000</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:32:15]</span>
+                <span class="info">Connected to database successfully</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:35:22]</span>
+                <span class="success">MCP validation service initialized</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:40:18]</span>
+                <span class="info">New client connection from 192.168.1.105</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:42:33]</span>
+                <span class="info">Processing MCP request #1242</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:42:35]</span>
+                <span class="success">MCP #1242 validated and stored</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:45:12]</span>
+                <span class="warning">High memory usage detected (75%)</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:50:44]</span>
+                <span class="info">Processing MCP request #1243</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:50:47]</span>
+                <span class="error">Validation failed for MCP #1243: Missing required fields</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:55:21]</span>
+                <span class="info">Processing MCP request #1244</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 08:55:23]</span>
+                <span class="success">MCP #1244 validated and stored</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 09:01:05]</span>
+                <span class="info">Processing MCP request #1245</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 09:01:08]</span>
+                <span class="success">MCP #1245 validated and stored</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 09:05:33]</span>
+                <span class="info">Memory optimization routine started</span>
+            </div>
+            <div class="log-entry">
+                <span class="timestamp">[2023-11-15 09:05:40]</span>
+                <span class="success">Memory optimization complete. Usage reduced to 45%</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

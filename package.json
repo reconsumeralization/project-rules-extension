@@ -300,7 +300,7 @@
     "vaul": "^1.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@types/react": "^18.2.0",
+    "@types/react": "^19.1.0",
     "@types/react-dom": "^18.2.0",
     "css-loader": "^6.8.1",
     "style-loader": "^3.3.3",

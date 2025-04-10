@@ -1,24 +1,22 @@
 #!/usr/bin/env node
 
-/**
- * Dead Code Detector
- * 
- * A tool that identifies unused or unreachable code in your codebase.
- * 
- * Usage:
- *   node dead-code-detector.js [options]
- * 
- * Options:
- *   --src DIR             Source directory to analyze (default: ./src)
- *   --include PATTERN     File pattern to include (default: **/*.{js,ts,jsx,tsx})
- *   --exclude PATTERN     File pattern to exclude (default: **/*.{test,spec}.{js,ts,jsx,tsx})
- *   --output FILE         Output file for report (default: dead-code-report.md)
- *   --format FORMAT       Output format: markdown|json|html|text (default: markdown)
- *   --ignore-comments     Ignore commented code (default: false)
- *   --threshold NUMBER    Confidence threshold for reporting (default: 75)
- *   --verbose             Display detailed information
- *   --help                Display this help
- */
+// Dead Code Detector
+// 
+// A tool that identifies unused or unreachable code in your codebase.
+// 
+// Usage:
+//   node dead-code-detector.js [options]
+// 
+// Options:
+//   --src DIR             Source directory to analyze (default: ./src)
+//   --include PATTERN     File pattern to include (default: **/*.{js,ts,jsx,tsx})
+//   --exclude PATTERN     File pattern to exclude (default: **/*.{test,spec}.{js,ts,jsx,tsx})
+//   --output FILE         Output file for report (default: dead-code-report.md)
+//   --format FORMAT       Output format: markdown|json|html|text (default: markdown)
+//   --ignore-comments     Ignore commented code (default: false)
+//   --threshold NUMBER    Confidence threshold for reporting (default: 75)
+//   --verbose             Display detailed information
+//   --help                Display this help
 
 const fs = require('fs')
 const path = require('path')

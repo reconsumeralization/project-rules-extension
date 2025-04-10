@@ -78,7 +78,7 @@ The AI integration analyzes your code (respecting `.gitignore` and configuration
 - Generate implementation tasks based on rule requirements.
 - Summarize large files or multiple files to fit context limits (configurable).
 
-*Note: An API key for the AI service is required (`projectRules.ai.apiKey`).*
+### Note: An API key for the AI service is required (`projectRules.ai.apiKey`)
 
 ## 🔄 Rule Synchronization
 
@@ -106,14 +106,101 @@ Implement rules with trackable tasks:
 Advanced AI model context management:
 
 - **MCP Editor** for creating standardized AI context protocols
+  - Design structured context protocols with dedicated editor
+  - Define parameters, capabilities, and limitations for AI models
+  - Use markdown-based format with specialized validation
+  - Create templates for different types of AI interactions
+  - Version and track changes to protocols over time
+
 - **Agent Management** for monitoring AI assistants
+  - Register and configure AI agents with the MCP server
+  - Control agent activation state (active/inactive/paused)
+  - Define agent roles and permissions within your project
+  - Manage agent interactions with rules and tasks
+  - View agent execution logs and action history
+
 - **Protocol Validation** to ensure consistency
+  - Automatic validation against MCP schema
+  - Detect missing or inconsistent parameters
+  - Ensure proper formatting and structure
+  - Generate warnings for potential issues
+  - Suggestions for improving protocol effectiveness
+
 - **Agent Statistics** for tracking performance
+  - Monitor processing time and resource usage
+  - Track suggestion quality and acceptance rate
+  - Measure agent productivity and contribution
+  - Compare performance across different agents
+  - Export metrics for external analysis
+
 - **Autonomy Controls** for AI-driven suggestions
+  - Set autonomy levels from manual-only to fully autonomous
+  - Schedule automated analysis cycles
+  - Configure suggestion thresholds and confidence levels
+  - Define scope boundaries for autonomous operation
+  - Emergency override controls for unexpected behavior
+
+## 🔄 Enhanced Taskmaster
+
+The Enhanced Taskmaster workflow provides a comprehensive development management system:
+
+- **Phase-Based Development** with specialized AI agents:
+  - Planning phase with Protocol Validator Agent
+  - Design phase with Integration Assistant Agent
+  - Implementation phase with Integration Assistant Agent
+  - Testing phase with Protocol Validator Agent
+  - Review phase with Protocol Enhancement Agent
+  - Deployment phase with Monitoring & Analytics Agent
+
+- **AI-Driven Task Breakdown**:
+  - Automatically analyze complex tasks
+  - Generate logical subtasks with proper dependencies
+  - Estimate complexity and effort for each subtask
+  - Assign appropriate development phases
+  - Preserve context between related tasks
+
+- **Tradeoff Analysis**:
+  - Evaluate different implementation approaches
+  - Analyze pros/cons of each approach
+  - Calculate complexity, risk, and time requirements
+  - Document decisions with comprehensive rationale
+  - Reference for future architectural decisions
+  
+- **MCP Server Integration**:
+  - Connect to specialized AI agents for different development phases
+  - Enhance analysis capabilities with Protocol Enhancement Agent
+  - Validate implementations against standardized protocols
+  - Track project metrics with Monitoring & Analytics Agent
+  - Improve code quality through consistent compliance checks
+
+- **Progress Visualization**:
+  - Phase-based progress tracking
+  - Metrics for completion rates and bottlenecks
+  - Visual representations of development status
+  - Project health indicators and recommendations
+  - Historical performance data and trends
+
+### Taskmaster Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run taskmaster:enhanced` | Run enhanced Taskmaster in interactive mode |
+| `npm run taskmaster:phase-planning` | Run Taskmaster in planning phase |
+| `npm run taskmaster:phase-design` | Run Taskmaster in design phase |
+| `npm run taskmaster:phase-implementation` | Run Taskmaster in implementation phase |
+| `npm run taskmaster:phase-testing` | Run Taskmaster in testing phase |
+| `npm run taskmaster:phase-review` | Run Taskmaster in review phase |
+| `npm run taskmaster:phase-deployment` | Run Taskmaster in deployment phase |
+| `npm run taskmaster:analyze` | Analyze and break down tasks |
+| `npm run taskmaster:mcp` | Enable MCP server integration |
+| `npm run taskmaster:progress` | Generate phase-based progress report |
+| `npm run taskmaster:tradeoff` | Perform tradeoff analysis for approaches |
+| `npm run taskmaster:tradeoff-task` | Run tradeoff analysis for specific task |
+| `npm run taskmaster:tradeoff-mcp` | Use MCP integration for tradeoff analysis |
 
 ## ✨ Visual Examples
 
-*(Placeholder: Add screenshots/GIFs showing the Rule Explorer, Task View, MCP Agent Monitor, AI Suggestion Preview, etc.)*
+### Placeholder: Add screenshots/GIFs showing the Rule Explorer, Task View, MCP Agent Monitor, AI Suggestion Preview, etc
 
 ## ⌨️ Key Commands
 
@@ -191,7 +278,9 @@ The extension follows a standard VS Code architecture:
 2. **Webview (Browser)**: Renders the UI components (Rule Explorer, Task View, MCP Editor) using web technologies (React, Tailwind assumed).
 3. **Message Passing**: A secure bridge for communication between the Extension Host and Webview environments.
 
-*(Placeholder: Add link to a diagram or more detailed architecture doc if available)*
+### Placeholder for Architecture Diagram
+
+Add link to a diagram or more detailed architecture doc if available.
 
 ## 🛠️ Development Setup
 
@@ -253,7 +342,9 @@ Please follow our contribution guidelines when participating.
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-*(Placeholder: Create a CHANGELOG.md file if it doesn't exist)*
+### Placeholder for Changelog
+
+Create a CHANGELOG.md file if it doesn't exist.
 
 ## 📄 License
 
@@ -274,3 +365,57 @@ VS Code, Extension, Rules Engine, Linting, Code Standards, Conventions, AI, Auto
 ---
 
 Made with ❤️ for developers who care about code quality and documentation
+
+## Taskmaster Integration
+
+This project uses Taskmaster for managing task implementation workflow. The workflow is automated via both JavaScript and shell scripts.
+
+### Taskmaster Workflow Guidelines
+
+1. Always check the current task status using `taskmaster list` before starting work.
+2. When starting a task, use `taskmaster update id=[task_id] status=in-progress` to update its status.
+3. After completing a task, use `taskmaster update id=[task_id] status=completed` to mark it as done.
+4. Use `taskmaster next` to identify the next task to work on based on dependencies.
+5. Document architectural decisions in task notes files (in `docs/taskmaster`).
+
+### Automation Options
+
+You can run the Taskmaster workflow in various modes:
+
+#### NPM Scripts
+
+- `npm run taskmaster` - Interactive workflow (ask questions)
+- `npm run taskmaster:auto` - Fully automated mode with default choices
+- `npm run taskmaster:complete` - Automatically complete the current task
+- `npm run taskmaster:task 123` - Work on a specific task ID
+
+#### VS Code Tasks
+
+Press `Ctrl+Shift+P` and search for "Tasks: Run Task" to access:
+
+- `Taskmaster: Start Next Task` - Interactive workflow
+- `Taskmaster: Auto-Start Next Task` - Fully automated
+- `Taskmaster: Complete Current Task` - Mark current as done
+- `Taskmaster: Work on Specific Task` - Specify task ID
+
+#### GitHub Actions
+
+The repository includes a GitHub Actions workflow at `.github/workflows/taskmaster.yml` that can be triggered manually to:
+
+- Check current tasks
+- Start the next available task
+- Complete the current task
+- Work on a specific task
+
+### Recent Tasks
+
+- ✅ Task #123: Implement TypeScript event handlers compatibility
+- 🔄 Task #124: Add unit tests for event handlers (pending)
+
+## Development
+
+To run the development server:
+
+```bash
+npm run watch
+```

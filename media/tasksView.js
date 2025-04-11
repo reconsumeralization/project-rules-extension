@@ -191,11 +191,11 @@ function initEventListeners() {
 // Handle clicks within the task container using delegation
 function handleTaskContainerClick(event) {
     const target = event.target.closest('button.task-action-btn');
-    if (!target) return; 
+    if (!target) {return}
 
     const taskCard = target.closest('.task-card');
     const taskId = taskCard?.dataset.id;
-    if (!taskId) return;
+    if (!taskId) {return}
 
     // Edit task button
     if (target.classList.contains('edit-task-btn')) {
@@ -379,7 +379,9 @@ function saveTask() {
 
 // Delete task
 function deleteTask() {
-    if (!state.currentTask) return;
+    if (!state.currentTask) {
+        return;
+    }
     
     vscode.postMessage({
         command: 'deleteTask',
@@ -396,7 +398,9 @@ function populateRulesDropdown() {
     
     ruleDropdowns.forEach(dropdown => {
         // Skip if dropdown not found
-        if (!dropdown) return;
+        if (!dropdown) {
+            return;
+        }
         
         // Save current selection
         const currentValue = dropdown.value;
@@ -429,7 +433,9 @@ function populateAssigneesDropdown() {
     const dropdown = document.getElementById('assigneeFilter');
     
     // Skip if dropdown not found
-    if (!dropdown) return;
+    if (!dropdown) {
+        return;
+    }
     
     // Save current selection
     const currentValue = dropdown.value;
@@ -538,15 +544,27 @@ function getFilteredAndSortedTasks() {
             return false;
         }
         // Status filter
-        if (state.filters.status !== 'all' && task.status !== state.filters.status) return false;
+        if (state.filters.status !== 'all' && task.status !== state.filters.status) {
+            return false;
+        }
         // Priority filter
-        if (state.filters.priority !== 'all' && task.priority !== state.filters.priority) return false;
+        if (state.filters.priority !== 'all' && task.priority !== state.filters.priority) {
+            return false;
+        }
         // Assignee filter
-        if (state.filters.assignee === 'unassigned' && task.metadata.assignedTo) return false;
-        else if (state.filters.assignee !== 'all' && state.filters.assignee !== 'unassigned' && task.metadata.assignedTo !== state.filters.assignee) return false;
+        if (state.filters.assignee === 'unassigned' && task.metadata.assignedTo) {
+            return false;
+        }
+        else if (state.filters.assignee !== 'all' && state.filters.assignee !== 'unassigned' && task.metadata.assignedTo !== state.filters.assignee) {
+            return false;
+        }
         // Rule link filter
-        if (state.filters.ruleLink === 'no-rule' && task.ruleId) return false;
-        else if (state.filters.ruleLink !== 'all' && state.filters.ruleLink !== 'no-rule' && task.ruleId !== state.filters.ruleLink) return false;
+        if (state.filters.ruleLink === 'no-rule' && task.ruleId) {
+            return false;
+        }
+        else if (state.filters.ruleLink !== 'all' && state.filters.ruleLink !== 'no-rule' && task.ruleId !== state.filters.ruleLink) {
+            return false;
+        }
         
         return true;
     });
@@ -590,12 +608,20 @@ function getFilteredAndSortedTasks() {
         
         // Comparison logic
         if (sortOrder === 'asc') {
-            if (valA < valB) return -1;
-            if (valA > valB) return 1;
+            if (valA < valB) {
+                return -1;
+            }
+            if (valA > valB) {
+                return 1;
+            }
             return 0;
         } else { // desc
-            if (valA < valB) return 1;
-            if (valA > valB) return -1;
+            if (valA < valB) {
+                return 1;
+            }
+            if (valA > valB) {
+                return -1;
+            }
             return 0;
         }
     });
@@ -637,7 +663,9 @@ function getStatusIcon(status) {
 }
 
 function escapeHtml(unsafe) {
-    if (!unsafe) return '';
+    if (!unsafe) {
+        return '';
+    }
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")

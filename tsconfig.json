@@ -16,11 +16,6 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]

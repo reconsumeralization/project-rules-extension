@@ -1,0 +1,269 @@
+/* Notepad View Styles */
+
+.notepad-view {
+  display: flex;
+  height: 100vh;
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  background-color: var(--vscode-editor-background);
+}
+
+.sidebar {
+  width: 250px;
+  border-right: 1px solid var(--vscode-panel-border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.editor {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.notepad-controls {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notepad-list {
+  flex: 1;
+}
+
+.notepad-list h3 {
+  margin-top: 0;
+  color: var(--vscode-foreground);
+  font-weight: 600;
+}
+
+.notepad-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notepad-list li {
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.notepad-list li:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.notepad-list li.selected {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+  border-left-color: var(--vscode-focusBorder);
+}
+
+.notepad-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notepad-meta {
+  display: flex;
+  align-items: center;
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+.notepad-date {
+  margin-right: 8px;
+}
+
+.notepad-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.editor-header h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tag-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-input-field {
+  display: flex;
+  gap: 8px;
+}
+
+.ai-prompt {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.content-view {
+  padding: 10px 0;
+}
+
+.ai-actions {
+  margin-bottom: 10px;
+}
+
+.markdown-content {
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.notifications {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 300px;
+}
+
+.notification {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  background-color: var(--vscode-notification-infoBackground);
+  color: var(--vscode-notification-infoForeground);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.notification.error {
+  background-color: var(--vscode-notification-errorBackground);
+  color: var(--vscode-notification-errorForeground);
+}
+
+.notification.fadeout {
+  opacity: 0;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Operations status panel */
+.operations-status {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.operations-status h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.operation-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.operation-item.completed {
+  background-color: rgba(129, 184, 139, 0.1);
+  /* Using rgba instead of background-opacity which is not a valid CSS property */
+}
+
+.operation-item.failed {
+  background-color: rgba(199, 78, 57, 0.1);
+  /* Using rgba instead of background-opacity which is not a valid CSS property */
+}
+
+.operation-item.cancelled {
+  background-color: rgba(226, 192, 141, 0.1);
+  /* Using rgba instead of background-opacity which is not a valid CSS property */
+}
+
+.operation-progress {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.operation-details {
+  flex: 1;
+}
+
+.operation-title {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.operation-message {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+}
+
+/* Codicon styles */
+.codicon {
+  font-size: 16px;
+}
+
+.codicon-check {
+  color: var(--vscode-gitDecoration-addedResourceForeground, #81b88b);
+}
+
+.codicon-error {
+  color: var(--vscode-gitDecoration-deletedResourceForeground, #c74e39);
+} 

@@ -61,7 +61,7 @@ export async function getProjectContextSummary(): Promise<{
         return null; // No workspace open
     }
     const workspaceUri = workspaceFolder.uri;
-    let summary: { 
+    const summary: { 
         rootDirs?: string[], 
         dependencies?: { [key: string]: string },
         devDependencies?: { [key: string]: string }

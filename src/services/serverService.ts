@@ -40,6 +40,51 @@ interface SuggestImprovementsContext {
 export type ConnectionStatus = 'connected' | 'disconnected' | 'connecting' | 'error';
 
 export class ServerService {
+  callAIService<T = any>(request: { action: string; data: any }): Promise<{ success: boolean; data?: T; error?: string }> {
+    console.log(`ServerService.callAIService called with action: ${request.action}`);
+    return this._fetchApi('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    }).then(async (response) => {
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error(`AI Service Error (${response.status}): ${errorText}`);
+        return {
+          success: false,
+          error: `AI service error (${response.status}): ${errorText}`
+        };
+      }
+      
+      // Check for empty response (e.g., 204 No Content)
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return {
+          success: true,
+          data: {} as T
+        };
+      }
+      
+      try {
+        const data = await response.json();
+        return {
+          success: true,
+          data
+        };
+      } catch (error) {
+        console.error('Error parsing AI service response:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to parse AI service response'
+        };
+      }
+    }).catch(error => {
+      console.error('Error calling AI service:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error calling AI service'
+      };
+    });
+  }
   private _serverUrl: string;
   private _authToken?: string;
   private _connectionStatus: ConnectionStatus = 'disconnected';
@@ -410,12 +455,12 @@ export class ServerService {
         
         // Handle specific auth errors
         if (response.status === 401 || response.status === 403) {
-            if (this._connectionStatus !== 'connecting') this._updateStatus('error');
+            if (this._connectionStatus !== 'connecting') {this._updateStatus('error');}
             throw new AuthError(errorMessage); // Use specific AuthError
         }
 
         // Throw ServerError for other non-OK responses
-        if (this._connectionStatus !== 'connecting') this._updateStatus('error');
+        if (this._connectionStatus !== 'connecting') {this._updateStatus('error');}
         throw new ServerError(errorMessage, errorCode, response.status, errorData.error?.details);
       }
 
@@ -488,41 +533,114 @@ export class ServerService {
 
   /**
    * Deletes multiple rules from the server.
-   * Returns an array of IDs that were successfully deleted (if server provides it).
-   * Throws an error if the batch operation fails.
+   * 
+   * Makes a batch deletion request to the server API, removing multiple rules
+   * in a single operation for better performance. Handles various response types
+   * from the server including empty success responses and detailed deletion reports.
+   * 
+   * @param ruleIds - Array of rule IDs to delete from the server
+   * @returns Promise resolving to an array of successfully deleted rule IDs
+   * @throws Error if the network request fails or server returns an error response
    */
   async deleteRules(ruleIds: string[]): Promise<string[]> {
-    const response = await this._fetchApi('/api/rules/batch', { // Assuming DELETE /api/rules/batch
-      method: 'DELETE',
-      body: JSON.stringify({ ids: ruleIds })
-    });
-    // Server might return 204 No Content on success, or JSON with deleted IDs
-    if (response.status === 204) {
-      return ruleIds; // Assume all requested IDs were deleted if status is 204
+    if (!ruleIds.length) {
+      console.log('ServerService: deleteRules called with empty ID array, no operation needed');
+      return [];
     }
-    const data = await response.json();
-    // Adjust based on actual server response format
-    if (data && Array.isArray(data.deletedIds)) {
-      return data.deletedIds;
+    
+    try {
+      const response = await this._fetchApi('/api/rules/batch', {
+        method: 'DELETE',
+        body: JSON.stringify({ ids: ruleIds })
+      });
+      
+      // Handle HTTP 204 No Content success case
+      if (response.status === 204) {
+        console.log(`ServerService: Successfully deleted ${ruleIds.length} rules (204 No Content)`);
+        return ruleIds; // Assume all requested IDs were deleted
+      }
+      
+      // Handle success with response data
+      try {
+        const data = await response.json();
+        
+        // Server returned proper deletion report
+        if (data && Array.isArray(data.deletedIds)) {
+          const deletedCount = data.deletedIds.length;
+          console.log(`ServerService: Successfully deleted ${deletedCount}/${ruleIds.length} rules`);
+          return data.deletedIds;
+        }
+        
+        // Server returned unexpected but potentially valid response
+        if (data && Array.isArray(data)) {
+          console.warn('ServerService: Server returned direct array instead of {deletedIds: [...]}');
+          return data;
+        }
+        
+        // Unexpected response format but not an error status code
+        console.warn('ServerService: Unexpected response format from deleteRules endpoint:', data);
+        throw new Error('Unexpected response format from server deleteRules endpoint');
+      } catch (parseError) {
+        // JSON parsing failed but response was OK
+        if (response.ok) {
+          console.warn('ServerService: Could not parse JSON from successful deleteRules response');
+          return ruleIds; // Assume success if status was OK
+        }
+        
+        // Both JSON parsing failed and response was not OK
+        throw new Error(`Server returned ${response.status} ${response.statusText} with invalid JSON`);
+      }
+    } catch (error) {
+      // Log the error with additional context
+      console.error(`ServerService: Error deleting rules batch (${ruleIds.length} rules):`, error);
+      
+      // Rethrow with a user-friendly message but preserve original error
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to delete rules from server: ${message}`);
     }
-    // If response is unexpected, assume none were deleted or throw error
-    console.warn('Unexpected response format from deleteRules endpoint:', data);
-    // Depending on strictness, either return [] or throw an error
-    // throw new Error('Unexpected response format from deleteRules endpoint.');
-    return []; // For now, return empty array on unexpected response
   }
 } 
 
-export function analyzeRuleApplicability(id: string, fileContent: string) {
-  throw new Error('Function not implemented.')
+export function analyzeRuleApplicability(id: string, fileContent: string, filePath?: string): Promise<RuleApplicabilityResult> {
+  // Get the ServerService instance from extension
+  const extension = vscode.extensions.getExtension('project-rules-extension');
+  if (!extension) {
+    throw new Error('Project Rules extension not available');
+  }
+  
+  // Access the ServerService instance
+  const serverService = extension.exports.getServerService();
+  if (!serverService) {
+    throw new Error('ServerService not available from extension exports');
+  }
+  
+  return serverService.analyzeRuleApplicability(id, fileContent, filePath);
 }
 
-
-export function suggestRuleImprovements(id: string) {
-  throw new Error('Function not implemented.')
+export function suggestRuleImprovements(id: string, context: SuggestImprovementsContext): Promise<RuleSuggestion[]> {
+  const extension = vscode.extensions.getExtension('project-rules-extension');
+  if (!extension) {
+    throw new Error('Project Rules extension not available');
+  }
+  
+  const serverService = extension.exports.getServerService();
+  if (!serverService) {
+    throw new Error('ServerService not available from extension exports');
+  }
+  
+  return serverService.suggestImprovements(id, context);
 }
 
-
-export function generateRuleFromFile(filename: string, fileContent: string) {
-  throw new Error('Function not implemented.')
+export function generateRuleFromFile(filename: string, fileContent: string): Promise<Rule | undefined> {
+  const extension = vscode.extensions.getExtension('project-rules-extension');
+  if (!extension) {
+    throw new Error('Project Rules extension not available');
+  }
+  
+  const serverService = extension.exports.getServerService();
+  if (!serverService) {
+    throw new Error('ServerService not available from extension exports');
+  }
+  
+  return serverService.generateRuleFromFile(filename, fileContent);
 }

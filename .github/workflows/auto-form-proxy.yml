@@ -1,0 +1,104 @@
+name: Automated Form Proxy CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      form:
+        description: "Form to run"
+        type: choice
+        options:
+          - taskmaster
+          - doc-analysis
+          - terminology
+          - fix-docs
+        default: "taskmaster"
+        required: true
+      preset:
+        description: "Preset to use (leave empty to use config file)"
+        type: string
+        required: false
+      custom_workflow:
+        description: "Custom workflow to run"
+        type: choice
+        options:
+          - none
+          - documentation-quality-check
+          - implementation-phase-setup
+        default: "none"
+        required: true
+      task_id:
+        description: "Optional task ID"
+        type: string
+        required: false
+
+jobs:
+  run-auto-form:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run with preset if provided
+      - name: Run auto-form with preset
+        if: inputs.preset != ''
+        run: node scripts/automated-form-proxy.js --form=${{ inputs.form }} --preset=${{ inputs.preset }}
+
+      # Run with task ID if provided
+      - name: Run auto-form with task
+        if: inputs.preset == '' && inputs.task_id != ''
+        run: |
+          echo '{
+            "${{ inputs.form }}": {
+              "version": "enhanced",
+              "action": "default",
+              "phase": "none",
+              "options": ["mcp-integrate"],
+              "taskId": "${{ inputs.task_id }}",
+              "submitAction": "run"
+            }
+          }' > temp-config.json
+          node scripts/automated-form-proxy.js --form=${{ inputs.form }} --config=temp-config.json
+
+      # Run workflow if selected
+      - name: Run custom workflow
+        if: inputs.custom_workflow != 'none'
+        run: |
+          # Extract and run each step in the workflow
+          WORKFLOW="${{ inputs.custom_workflow }}"
+          STEPS=$(jq -r ".workflows.\"$WORKFLOW\" | length" config/auto-form-presets.json)
+
+          for i in $(seq 0 $(($STEPS - 1))); do
+            STEP_NAME=$(jq -r ".workflows.\"$WORKFLOW\"[$i].name" config/auto-form-presets.json)
+            PRESET=$(jq -r ".workflows.\"$WORKFLOW\"[$i].preset" config/auto-form-presets.json)
+            CONFIG=$(jq -r ".custom-presets.\"$PRESET\"" config/auto-form-presets.json)
+            
+            echo "Running step: $STEP_NAME with preset $PRESET"
+            echo "$CONFIG" > temp-workflow-step.json
+            FORM=$(echo "$CONFIG" | jq -r 'keys[0]')
+            
+            node scripts/automated-form-proxy.js --form=$FORM --config=temp-workflow-step.json
+          done
+
+      # Default case - just run form
+      - name: Run auto-form with default config
+        if: inputs.preset == '' && inputs.task_id == '' && inputs.custom_workflow == 'none'
+        run: node scripts/automated-form-proxy.js --form=${{ inputs.form }}
+
+      # Archive any generated reports
+      - name: Archive documentation reports
+        if: inputs.form == 'doc-analysis' || inputs.custom_workflow == 'documentation-quality-check'
+        run: |
+          mkdir -p artifact_output
+          cp -r docs/reports/* artifact_output/
+          echo "Documentation reports saved to artifact_output directory"
+          # In a real workflow, you would upload these artifacts using your CI provider's native method

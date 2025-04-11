@@ -7,7 +7,7 @@ This document explains how to use the enhanced version of Taskmaster to automate
 The Enhanced Taskmaster workflow builds on the original Taskmaster script with the following key improvements:
 
 1. **Structured Development Phases**: Tasks are organized into distinct development phases
-2. **AI-Driven Task Breakdown**: Automatic task analysis and breakdown with MCP server integration
+2. **AI-Driven Task Breakdown**: Task analysis and breakdown with MCP server assistance
 3. **Phase-Based Progress Tracking**: Visualize progress across different phases of development
 4. **MCP Server Integration**: Connect to Model Context Protocol servers for AI-assisted development
 5. **Improved Automation**: Enhanced CI/CD workflows for phase-based development
@@ -54,7 +54,7 @@ node scripts/taskmaster-enhanced.js --phase=<phase-name>
 
 ### Task Analysis and Breakdown
 
-To analyze and automatically break down a specific task:
+To analyze and break down a specific task with assistance:
 
 ```bash
 npm run taskmaster:analyze -- <task-id>
@@ -120,7 +120,7 @@ When breaking down tasks with MCP server integration, the system:
 4. Presents the subtasks for review and approval
 5. Creates the approved subtasks in the task tracking system
 
-Each subtask is automatically assigned to the appropriate development phase with an estimated complexity score.
+Each subtask is assigned to the appropriate development phase with an estimated complexity score based on analysis.
 
 ## Visualizing Progress
 
@@ -141,6 +141,15 @@ To configure the MCP server connection:
    - MCP Server URL
    - Authentication token
    - Agent refresh settings
+
+## Known Limitations
+
+The current implementation has some limitations to be aware of:
+
+1. MCP integration features are partially simulated in the current version
+2. Task breakdown requires human confirmation of generated subtasks
+3. Progress visualization is text-based rather than graphical
+4. Some advanced features mentioned in this documentation are planned for future releases
 
 ## Troubleshooting
 

@@ -472,8 +472,8 @@ function generateHtmlReport(results) {
       const relativeFilePath = path.relative(process.cwd(), issue.filePath)
       const location = issue.location.split(':').slice(1).join(':')
       let confidenceClass = 'confidence-medium'
-      if (issue.confidence >= 90) confidenceClass = 'confidence-high'
-      else if (issue.confidence < 70) confidenceClass = 'confidence-low'
+      if (issue.confidence >= 90) {confidenceClass = 'confidence-high'}
+      else if (issue.confidence < 70) {confidenceClass = 'confidence-low'}
       
       html += `
       <tr>

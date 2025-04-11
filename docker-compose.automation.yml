@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Base automation service
+  form-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.automation
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+    environment:
+      - NODE_ENV=production
+    command: ["--form=main", "--verbose"]
+
+  # Documentation analysis service
+  doc-analysis:
+    extends: form-proxy
+    command: ["--form=doc-analysis", "--preset=doc-analysis-taskmaster"]
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs/reports:/app/docs/reports
+
+  # Terminology check service
+  terminology-check:
+    extends: form-proxy
+    command: ["--form=terminology", "--preset=fix-terminology-all"]
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs/terminology:/app/docs/terminology
+
+  # Taskmaster tradeoff analysis
+  taskmaster-tradeoff:
+    extends: form-proxy
+    command: ["--form=taskmaster", "--preset=taskmaster-tradeoff"]
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs/tradeoffs:/app/docs/tradeoffs
+
+  # Taskmaster complete current task
+  taskmaster-complete:
+    extends: form-proxy
+    command: ["--form=taskmaster", "--preset=taskmaster-complete-current"]
+    volumes:
+      - ./output:/app/output
+      - ./tasks:/app/tasks
+
+  # Custom config service - just specify which config file to use
+  custom-config:
+    extends: form-proxy
+    command: ["--form=${FORM:-taskmaster}", "--config=/app/config/${CONFIG_FILE:-custom-config.json}"]
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs:/app/docs
+
+  # Workflow runner
+  workflow-runner:
+    extends: form-proxy
+    command: ["--workflow=${WORKFLOW:-documentation-quality-check}"]
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs:/app/docs
+      - ./tasks:/app/tasks
+
+  # Documentation quality check workflow
+  doc-quality-check:
+    extends: workflow-runner
+    environment:
+      - WORKFLOW=documentation-quality-check
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs:/app/docs
+      - ./tasks:/app/tasks
+
+  # Implementation phase setup workflow
+  implementation-setup:
+    extends: workflow-runner
+    environment:
+      - WORKFLOW=implementation-phase-setup
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config
+      - ./docs:/app/docs
+      - ./tasks:/app/tasks 

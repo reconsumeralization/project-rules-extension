@@ -1,0 +1,360 @@
+# Enhanced Taskmaster Workflow with Gemini AI Integration
+#
+# NOTE: This workflow uses GitHub Actions:
+# - actions/checkout@v4        (Latest major version: v4.2.2)
+# - actions/setup-node@v4      (Latest major version: v4.3.0)
+# - peter-evans/create-pull-request@v7 (Latest major version: v7.0.8)
+# - actions/upload-artifact@v4 (Latest major version: v4.6.2)
+#
+# If you see linter errors in your local environment related to these actions,
+# it may be due to your local GitHub Actions schema validation not being updated.
+# These versions are valid and work correctly in GitHub Actions.
+#
+# For lint-free editing in VS Code/Cursor, run: npm run lint:fix-github-actions
+# This will update your local schema validation to support these versions.
+
+name: Enhanced Taskmaster Workflow with Gemini AI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run every day at 02:00 UTC for automated task processing
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to perform"
+        required: true
+        default: "auto"
+        type: choice
+        options:
+          - "auto"        # Fully automated with Gemini
+          - "work"        # Manual work mode
+          - "analyze"     # Analyze task
+          - "tradeoff"    # Perform tradeoff analysis
+          - "complete"    # Mark task as complete
+          - "report"      # Generate report
+      task_id:
+        description: "Task ID (if not provided, will choose the oldest pending task)"
+        required: false
+        type: string
+      message:
+        description: "Optional message or notes to include"
+        required: false
+        type: string
+      phase:
+        description: "Development phase"
+        required: false
+        type: choice
+        default: "planning"
+        options:
+          - planning
+          - research
+          - prototype
+          - implementation
+          - testing
+          - documentation
+          - deployment
+      subtask_breakdown:
+        description: "Automatically break down the task into subtasks"
+        required: false
+        type: boolean
+        default: true
+      ai_integration:
+        description: "AI provider to use"
+        required: false
+        type: choice
+        default: "gemini"
+        options:
+          - "gemini"
+          - "mcp"
+          - "none"
+      auto_approve:
+        description: "Automatically approve and merge PRs (requires additional permissions)"
+        required: false
+        type: boolean
+        default: false
+
+# Define environment variables used across jobs
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  MCP_API_KEY: ${{ secrets.MCP_API_KEY }}
+  TASKMASTER_BRANCH: "taskmaster/auto"
+  GEMINI_ENDPOINT: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro"
+
+jobs:
+  taskmaster:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Determine Task and Action
+        id: determine_task
+        run: |
+          if [[ -n "${{ github.event.inputs.task_id }}" ]]; then
+            echo "TASK_ID=${{ github.event.inputs.task_id }}" >> $GITHUB_ENV
+            echo "Using provided task ID: ${{ github.event.inputs.task_id }}"
+          else
+            echo "No task ID provided, will use the oldest pending task"
+            echo "TASK_ID=auto" >> $GITHUB_ENV
+          fi
+
+          if [[ -n "${{ github.event.inputs.action }}" ]]; then
+            echo "ACTION=${{ github.event.inputs.action }}" >> $GITHUB_ENV
+          else
+            # Default to auto mode for scheduled runs
+            echo "ACTION=auto" >> $GITHUB_ENV
+          fi
+          
+          echo "MESSAGE=${{ github.event.inputs.message }}" >> $GITHUB_ENV
+          echo "AI_INTEGRATION=${{ github.event.inputs.ai_integration || 'gemini' }}" >> $GITHUB_ENV
+          echo "RUN_ID=${{ github.run_id }}" >> $GITHUB_ENV
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper git history analysis
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Initialize Task Storage
+        run: |
+          mkdir -p ./data/taskmaster
+          if [ ! -f ./data/taskmaster/tasks.json ]; then
+            echo "Initializing Taskmaster storage..."
+            node scripts/taskmaster-init.js
+          else
+            echo "Task storage already exists"
+          fi
+
+      - name: List Pending Tasks
+        id: list_tasks
+        run: |
+          echo "Generating task report..."
+          TASKS_JSON=$(node scripts/taskmaster-enhanced.js --report --json)
+          echo "TASKS_JSON=$TASKS_JSON" >> $GITHUB_ENV
+          echo "::set-output name=tasks_json::$TASKS_JSON"
+          echo "$TASKS_JSON" > ./data/taskmaster/current-tasks.json
+
+      - name: Gemini Auto Task Selection
+        if: env.ACTION == 'auto' && env.AI_INTEGRATION == 'gemini'
+        id: gemini_select
+        run: |
+          echo "Using Gemini AI to analyze and select the optimal task..."
+          
+          # Prepare context for Gemini
+          PROJECT_FILES=$(find src -type f | grep -v "node_modules" | head -n 50 | jq -R -s -c 'split("\n")[:-1]')
+          REPO_INFO=$(git log --oneline -n 10 | jq -R -s -c .)
+          
+          # Create payload for Gemini API
+          cat > gemini-payload.json << EOF
+          {
+            "contents": [
+              {
+                "parts": [
+                  {
+                    "text": "You are Taskmaster, an AI assistant that helps manage software development tasks. Please analyze the current task list and suggest which task to work on next based on priority, dependencies, and team capacity. Then provide a detailed plan for implementing the selected task.\n\nCurrent tasks:\n$TASKS_JSON\n\nRecent repository history:\n$REPO_INFO\n\nPlease respond with a JSON object that contains:\n1. selected_task_id: ID of the task to work on\n2. implementation_plan: A detailed breakdown of how to implement this task\n3. rationale: Why you selected this task\n"
+                  }
+                ]
+              }
+            ],
+            "generationConfig": {
+              "temperature": 0.2,
+              "topP": 0.8,
+              "topK": 40,
+              "maxOutputTokens": 8192,
+              "responseMimeType": "application/json"
+            }
+          }
+          EOF
+          
+          # Call Gemini API
+          GEMINI_RESPONSE=$(curl -s -X POST "$GEMINI_ENDPOINT:generateContent" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $GEMINI_API_KEY" \
+            --data-binary @gemini-payload.json)
+          
+          # Extract the result
+          GEMINI_TEXT=$(echo $GEMINI_RESPONSE | jq -r '.candidates[0].content.parts[0].text')
+          SELECTED_TASK=$(echo $GEMINI_TEXT | jq -r '.selected_task_id')
+          
+          echo "SELECTED_TASK=$SELECTED_TASK" >> $GITHUB_ENV
+          echo "::set-output name=selected_task::$SELECTED_TASK"
+          echo "::set-output name=implementation_plan::$(echo $GEMINI_TEXT | jq -r '.implementation_plan')"
+          
+          # Save the full analysis
+          echo "$GEMINI_TEXT" > ./data/taskmaster/gemini-analysis.json
+          
+          echo "Gemini selected task $SELECTED_TASK for implementation"
+
+      - name: Gemini Implement Task
+        if: env.ACTION == 'auto' && env.AI_INTEGRATION == 'gemini'
+        id: gemini_implement
+        run: |
+          echo "Implementing task ${{ env.SELECTED_TASK || env.TASK_ID }} with Gemini AI..."
+          
+          # Create a branch for this task
+          BRANCH_NAME="${{ env.TASKMASTER_BRANCH }}/${{ env.SELECTED_TASK || env.TASK_ID }}"
+          git checkout -b $BRANCH_NAME
+          
+          # Prepare implementation context
+          TASK_DETAILS=$(node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --json)
+          
+          # Create payload for Gemini API for implementation
+          cat > gemini-implementation.json << EOF
+          {
+            "contents": [
+              {
+                "parts": [
+                  {
+                    "text": "You are Taskmaster, an AI developer implementing a task for a software project. Your job is to implement the task according to the specifications.\n\nTask details:\n$TASK_DETAILS\n\nPlease analyze what files need to be modified or created to implement this task. For each file, provide the complete content that should be in that file after your changes.\n\nProvide your response as a JSON object with this structure:\n{\n  \"files\": [\n    {\n      \"path\": \"relative/path/to/file.js\",\n      \"content\": \"// Full content of the file\",\n      \"description\": \"What changes were made and why\"\n    }\n  ],\n  \"summary\": \"Overall summary of the implementation\"\n}"
+                  }
+                ]
+              }
+            ],
+            "generationConfig": {
+              "temperature": 0.2,
+              "topP": 0.8,
+              "topK": 40,
+              "maxOutputTokens": 8192,
+              "responseMimeType": "application/json"
+            }
+          }
+          EOF
+          
+          # Call Gemini API
+          GEMINI_RESPONSE=$(curl -s -X POST "$GEMINI_ENDPOINT:generateContent" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $GEMINI_API_KEY" \
+            --data-binary @gemini-implementation.json)
+          
+          # Extract the result
+          GEMINI_TEXT=$(echo $GEMINI_RESPONSE | jq -r '.candidates[0].content.parts[0].text')
+          
+          # Save the full implementation plan
+          echo "$GEMINI_TEXT" > ./data/taskmaster/gemini-implementation.json
+          
+          # Apply the changes
+          FILES_TO_MODIFY=$(echo $GEMINI_TEXT | jq -c '.files[]')
+          echo $FILES_TO_MODIFY | jq -c . | while read -r file_json; do
+            FILE_PATH=$(echo $file_json | jq -r '.path')
+            FILE_CONTENT=$(echo $file_json | jq -r '.content')
+            FILE_DESC=$(echo $file_json | jq -r '.description')
+            
+            echo "Updating file: $FILE_PATH"
+            echo "Description: $FILE_DESC"
+            
+            # Ensure directory exists
+            mkdir -p $(dirname "$FILE_PATH")
+            
+            # Write content to file
+            echo "$FILE_CONTENT" > "$FILE_PATH"
+          done
+          
+          # Set up Git user
+          git config --global user.name "Taskmaster Bot (Gemini)"
+          git config --global user.email "taskmaster-gemini@example.com"
+          
+          # Commit the changes
+          git add .
+          git commit -m "Implement task ${{ env.SELECTED_TASK || env.TASK_ID }} using Gemini AI"
+          
+          # Capture implementation summary for PR description
+          IMPLEMENTATION_SUMMARY=$(echo $GEMINI_TEXT | jq -r '.summary')
+          echo "IMPLEMENTATION_SUMMARY<<EOF" >> $GITHUB_ENV
+          echo "$IMPLEMENTATION_SUMMARY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+          echo "::set-output name=branch_name::$BRANCH_NAME"
+          echo "::set-output name=implementation_summary::$IMPLEMENTATION_SUMMARY"
+          
+          echo "Implementation complete. Changes committed to branch $BRANCH_NAME"
+
+      - name: Analyze Task
+        if: env.ACTION == 'analyze' && (env.TASK_ID != '' || env.SELECTED_TASK != '')
+        run: |
+          echo "Analyzing task ${{ env.SELECTED_TASK || env.TASK_ID }}..."
+          node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --analyze
+
+      - name: Perform Tradeoff Analysis
+        if: env.ACTION == 'tradeoff' && (env.TASK_ID != '' || env.SELECTED_TASK != '')
+        run: |
+          echo "Performing tradeoff analysis for task ${{ env.SELECTED_TASK || env.TASK_ID }}..."
+          node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --tradeoff-analysis
+
+      - name: Manual Work on Task
+        if: env.ACTION == 'work' && (env.TASK_ID != '' || env.SELECTED_TASK != '')
+        run: |
+          echo "Working on task ${{ env.SELECTED_TASK || env.TASK_ID }}..."
+          # Set up Git user
+          git config --global user.name "Taskmaster Bot"
+          git config --global user.email "taskmaster@example.com"
+
+          # Create a new branch for this task
+          BRANCH_NAME="task/${{ env.SELECTED_TASK || env.TASK_ID }}"
+          git checkout -b $BRANCH_NAME
+
+          # Run the taskmaster script to work on the task
+          node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --work
+
+          # Changes are now made to the working directory
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Complete Task
+        if: (env.ACTION == 'complete' || env.ACTION == 'auto') && (env.TASK_ID != '' || env.SELECTED_TASK != '')
+        run: |
+          echo "Marking task ${{ env.SELECTED_TASK || env.TASK_ID }} as complete..."
+          node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --complete
+
+          # If we have a message, include it in the completion
+          if [[ -n "${{ env.MESSAGE }}" ]]; then
+            node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --add-note="${{ env.MESSAGE }}"
+          else
+            # Use AI-generated message if available
+            if [[ -n "${{ env.IMPLEMENTATION_SUMMARY }}" ]]; then
+              node scripts/taskmaster-enhanced.js --task=${{ env.SELECTED_TASK || env.TASK_ID }} --add-note="Completed by Gemini AI: ${{ env.IMPLEMENTATION_SUMMARY }}"
+            fi
+          fi
+
+      - name: Create Pull Request
+        if: (env.ACTION == 'work' || env.ACTION == 'auto') && (env.TASK_ID != '' || env.SELECTED_TASK != '')
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Task ${{ env.SELECTED_TASK || env.TASK_ID }}: Implementation by Taskmaster"
+          title: "Task ${{ env.SELECTED_TASK || env.TASK_ID }}: Implementation"
+          body: |
+            # Task Implementation: ${{ env.SELECTED_TASK || env.TASK_ID }}
+            
+            This PR was automatically generated by the Taskmaster system.
+            
+            ## Implementation Summary
+            ${{ env.IMPLEMENTATION_SUMMARY || env.MESSAGE || 'Task implemented as specified.' }}
+            
+            ## Additional Notes
+            - Run ID: ${{ env.RUN_ID }}
+            - AI Integration: ${{ env.AI_INTEGRATION }}
+            - Automated by: Gemini-powered Taskmaster
+          branch: ${{ env.BRANCH_NAME || format('{0}/{1}', env.TASKMASTER_BRANCH, env.SELECTED_TASK || env.TASK_ID) }}
+          base: main
+          labels: automated,task,gemini-ai
+          draft: false
+
+      - name: Upload Taskmaster data as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskmaster-data-${{ github.run_id }}
+          path: ./data/taskmaster/
+          retention-days: 7

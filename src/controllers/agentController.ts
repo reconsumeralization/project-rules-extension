@@ -103,7 +103,7 @@ function triggerAutoRefresh(isInitialLoad = false) {
     console.log('Executing debounced auto-refresh...');
     try {
         // Use the existing batch refresh command logic, but without user prompts
-        if (!agentService) throw new Error('Agent Service became unavailable.');
+        if (!agentService) {throw new Error('Agent Service became unavailable.');}
         
         vscode.window.setStatusBarMessage('$(sync~spin) Auto-refreshing agent stats...', 3000);
         const result = await agentService.refreshAllAgentStats();
@@ -132,13 +132,13 @@ async function createAgent(): Promise<void> {
     ['Validation', 'Code Generation', 'Optimization', 'Observability', 'Intelligence', 'Custom'],
     { placeHolder: 'Select agent type' }
   );
-  if (!agentType) return;
+  if (!agentType) {return;}
   
   const agentName = await vscode.window.showInputBox({ prompt: 'Enter agent name' });
-  if (!agentName) return;
+  if (!agentName) {return;}
   
   const agentDescription = await vscode.window.showInputBox({ prompt: 'Enter agent description' });
-  if (!agentDescription) return;
+  if (!agentDescription) {return;}
 
   try {
     const newAgent = await agentService.createAgent({
@@ -161,19 +161,19 @@ async function createAgent(): Promise<void> {
  * Command to delete an agent
  */
 async function deleteAgent(): Promise<void> {
-  if (!agentService) return;
+  if (!agentService) {return;}
 
   const agents = await agentService.getAgents();
   const agentPicks = agents.map(a => ({ label: a.name, description: a.type, id: a.id }));
   const selectedAgent = await vscode.window.showQuickPick(agentPicks, { placeHolder: 'Select agent to delete' });
   
-  if (!selectedAgent) return;
+  if (!selectedAgent) {return;}
 
   const confirmation = await vscode.window.showWarningMessage(
     `Are you sure you want to delete agent "${selectedAgent.label}"?`,
     { modal: true }, 'Delete'
   );
-  if (confirmation !== 'Delete') return;
+  if (confirmation !== 'Delete') {return;}
 
   try {
     const deleted = await agentService.deleteAgent(selectedAgent.id);
@@ -192,13 +192,13 @@ async function deleteAgent(): Promise<void> {
  * Command to toggle agent status (active/inactive)
  */
 async function toggleAgentStatus(): Promise<void> {
-   if (!agentService) return;
+   if (!agentService) {return;}
 
   const agents = await agentService.getAgents();
   const agentPicks = agents.map(a => ({ label: a.name, description: `Status: ${a.status}`, id: a.id }));
   const selectedAgent = await vscode.window.showQuickPick(agentPicks, { placeHolder: 'Select agent to toggle status' });
   
-  if (!selectedAgent) return;
+  if (!selectedAgent) {return;}
   
   try {
       const updatedAgent = await agentService.toggleAgentStatus(selectedAgent.id);
@@ -241,7 +241,7 @@ async function refreshAgentStats(): Promise<void> {
     placeHolder: 'Select agent to refresh statistics' 
   });
   
-  if (!selectedAgent) return;
+  if (!selectedAgent) {return;}
 
   try {
     // Show progress while refreshing
@@ -278,7 +278,7 @@ async function refreshAllAgentStats(): Promise<void> {
     'Refresh All'
   );
 
-  if (confirmation !== 'Refresh All') return;
+  if (confirmation !== 'Refresh All') {return;}
 
   try {
     let result: { successCount: number; errorCount: number } | undefined;
@@ -311,4 +311,8 @@ async function refreshAllAgentStats(): Promise<void> {
     console.error('Failed to refresh all agent stats:', message);
     vscode.window.showErrorMessage(`Failed to refresh all agent stats: ${message}`);
   }
+}
+
+export function initialize(context: vscode.ExtensionContext, mcpAgentService: McpAgentService) {
+  throw new Error('Function not implemented.');
 }

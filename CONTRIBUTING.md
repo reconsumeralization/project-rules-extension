@@ -56,4 +56,4 @@ See the [Development Setup](README.md#🛠️-development-setup) section in the 
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE). 
+By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).

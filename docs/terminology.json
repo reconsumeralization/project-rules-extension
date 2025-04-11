@@ -1,0 +1,67 @@
+{
+  "taskmaster": [
+    "task master",
+    "task-master"
+  ],
+  "subtask": [
+    "sub-task",
+    "sub task"
+  ],
+  "tradeoff analysis": [
+    "trade-off analysis",
+    "tradeoff-analysis",
+    "trade off analysis"
+  ],
+  "phase": [
+    "stage",
+    "step"
+  ],
+  "planning phase": [
+    "planning stage",
+    "planning step"
+  ],
+  "design phase": [
+    "design stage",
+    "design step"
+  ],
+  "implementation phase": [
+    "implementation stage",
+    "implementation step",
+    "coding phase",
+    "coding stage"
+  ],
+  "testing phase": [
+    "testing stage",
+    "testing step",
+    "test phase"
+  ],
+  "review phase": [
+    "review stage",
+    "review step"
+  ],
+  "deployment phase": [
+    "deployment stage",
+    "deployment step",
+    "release phase"
+  ],
+  "mcp": [
+    "model context protocol",
+    "model-context-protocol"
+  ],
+  "enhanced taskmaster": [
+    "advanced taskmaster",
+    "taskmaster enhanced"
+  ],
+  "workflow": [
+    "work flow",
+    "work-flow"
+  ],
+  "autonomous": [
+    "automated",
+    "automatic"
+  ],
+  "autonomous mode": [
+    "automated mode",
+    "automatic mode"
+  ]
+}

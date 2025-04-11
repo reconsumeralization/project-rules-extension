@@ -37,7 +37,7 @@ async function ensureCacheDirectoryExists(): Promise<boolean> {
         console.error("CacheService: Disk cache path not initialized.");
         return false;
     }
-    if (cacheDirEnsured) return true;
+    if (cacheDirEnsured) {return true;}
 
     try {
         await vscode.workspace.fs.stat(diskCachePath);
@@ -83,7 +83,7 @@ function isEntryValid<T>(entry: CacheEntry<T>, maxAgeMs?: number): boolean {
  * Returns undefined if the disk cache path is not initialized.
  */
 function getCacheFileUri(key: string): vscode.Uri | undefined {
-     if (!diskCachePath) return undefined;
+     if (!diskCachePath) {return undefined;}
      return vscode.Uri.joinPath(diskCachePath, sanitizeKey(key));
 }
 
@@ -125,7 +125,7 @@ export async function get<T>(
 
     // 2. Check disk cache
     const fileUri = getCacheFileUri(key);
-    if (!fileUri || !(await ensureCacheDirectoryExists())) return undefined;
+    if (!fileUri || !(await ensureCacheDirectoryExists())) {return undefined;}
 
     try {
         const fileData = await vscode.workspace.fs.readFile(fileUri);
@@ -194,7 +194,7 @@ export async function set<T>(
 
     // 2. Set disk cache (asynchronously)
     const fileUri = getCacheFileUri(key);
-    if (!fileUri || !(await ensureCacheDirectoryExists())) return;
+    if (!fileUri || !(await ensureCacheDirectoryExists())) {return;}
 
     try {
         const content = Buffer.from(JSON.stringify(entry), 'utf8');
@@ -222,7 +222,7 @@ export async function del(key: string): Promise<void> {
 
     // 2. Delete from disk
     const fileUri = getCacheFileUri(key);
-    if (!fileUri || !(await ensureCacheDirectoryExists())) return;
+    if (!fileUri || !(await ensureCacheDirectoryExists())) {return;}
 
     try {
         await vscode.workspace.fs.delete(fileUri);
@@ -240,7 +240,7 @@ export async function del(key: string): Promise<void> {
  */
 export async function clearAll(context?: vscode.ExtensionContext): Promise<void> {
     // If context is provided ensure init, otherwise rely on it being initialized already
-    if (context && !diskCachePath) initializeCachePath(context);
+    if (context && !diskCachePath) {initializeCachePath(context);}
     
     memoryCache.clear();
     console.log('CacheService: Memory cache cleared.');
@@ -270,3 +270,7 @@ export async function clearAll(context?: vscode.ExtensionContext): Promise<void>
         console.error(`CacheService: Failed to clear disk cache:`, error);
     }
 } 
+
+export function initialize(context: vscode.ExtensionContext) {
+  throw new Error('Function not implemented.');
+}

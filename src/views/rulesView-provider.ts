@@ -3,7 +3,7 @@ import * as path from 'path'
 import { getNonce } from '../utils'
 
 export class RulesViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'ProjectRules.rulesView'
+  public static readonly viewType = 'projectRules.rulesView'
   
   private _view?: vscode.WebviewView
   
@@ -95,7 +95,7 @@ export class RulesViewProvider implements vscode.WebviewViewProvider {
    * Send rules data to the webview
    */
   private _sendRules(): void {
-    if (!this._view) return
+    if (!this._view) {return}
     
     // Example: Send mock rules data
     const mockRules = [

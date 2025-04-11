@@ -1,0 +1,89 @@
+.mcp-protocol-editor {
+  padding: 1rem;
+  font-family: var(--vscode-font-family);
+  color: var(--vscode-foreground);
+}
+
+.mcp-protocol-editor h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--vscode-editor-foreground);
+}
+
+.mcp-protocol-editor h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--vscode-editor-foreground);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section p {
+  margin-bottom: 1rem;
+  color: var(--vscode-descriptionForeground);
+}
+
+.form-section > vscode-text-field {
+  display: block;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.parameter-item, .capability-item, .limitation-item {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--vscode-editor-background);
+  border-radius: 4px;
+  border: 1px solid var(--vscode-panel-border);
+}
+
+.parameter-item > vscode-text-field,
+.parameter-item > vscode-dropdown,
+.capability-item > vscode-text-field,
+.limitation-item > vscode-text-field,
+.limitation-item > vscode-dropdown {
+  display: block;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.parameter-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.75rem 0;
+}
+
+.parameter-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+vscode-divider {
+  margin: 1rem 0;
+}
+
+/* Improvements for VS Code's dark theme */
+body.vscode-dark .parameter-item,
+body.vscode-dark .capability-item,
+body.vscode-dark .limitation-item {
+  background-color: var(--vscode-editor-background);
+  border-color: var(--vscode-panel-border);
+}
+
+/* Improvements for VS Code's light theme */
+body.vscode-light .parameter-item,
+body.vscode-light .capability-item,
+body.vscode-light .limitation-item {
+  background-color: var(--vscode-editor-background);
+  border-color: var(--vscode-panel-border);
+} 

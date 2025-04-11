@@ -4,7 +4,7 @@ import { Rule, RuleMetadata, createRuleFromFileContent } from '../models/rule'
 import * as localStorageService from '../services/localStorageService'
 import * as ruleController from './ruleController'
 import { ServerService } from '../services/serverService'
-import { SyncOperations, SyncResult, RuleConflict } from '../models/rule'
+import { SyncOperations, SyncResult, RuleConflict } from '../models/sync'
 
 // --- Module State ---
 

@@ -142,7 +142,7 @@ export class TaskAiService {
     let task: Task | undefined;
     try {
       task = taskController.getTaskById(taskId);
-      if (!task) throw new Error(`Task with ID ${taskId} not found`);
+      if (!task) {throw new Error(`Task with ID ${taskId} not found`);}
       if (task.status === 'completed') {
         return {
           completed: true,
@@ -155,7 +155,7 @@ export class TaskAiService {
       let ruleContent: string | null = null;
       if (task.ruleId) {
         const rule = ruleController.getRuleById(task.ruleId);
-        if (rule) ruleContent = rule.content;
+        if (rule) {ruleContent = rule.content;}
       }
 
       // --- Get Configuration ---
@@ -166,7 +166,7 @@ export class TaskAiService {
       const includeRuleContext = config.get<boolean>('includeRuleContextInTaskExecution', true); // Default true
 
       // Fetch Workspace File Context
-      let fileSnippets: { [filePath: string]: string } = {};
+      const fileSnippets: { [filePath: string]: string } = {};
       const textToSearch = `${task.metadata.title}\n${task.metadata.description || ''}\n${ruleContent || ''}`;
       const potentialPaths = this._extractFilePaths(textToSearch);
       const validatedPaths: string[] = [];
@@ -270,7 +270,7 @@ export class TaskAiService {
       const newStatus: TaskStatus = result.completed ? 'completed' : result.blocked ? 'blocked' : 'in-progress';
       
       // Prepare update payload
-      let taskUpdatePayload: Partial<TaskMetadata & Pick<Task, 'status' | 'priority' | 'ruleId'> > = {
+      const taskUpdatePayload: Partial<TaskMetadata & Pick<Task, 'status' | 'priority' | 'ruleId'> > = {
           status: newStatus
       };
       
@@ -712,7 +712,7 @@ Priority: ${task.priority}
    * @returns An array of unique potential file paths found.
    */
   private _extractFilePaths(text: string): string[] {
-    if (!text) return [];
+    if (!text) {return [];}
     // Regex Explanation:
     // ([\'\"`]?)     - Optional opening quote (capture group 1)
     // (            - Start Path Capture Group 2
@@ -756,9 +756,9 @@ Priority: ${task.priority}
     // Basic file type inference for context (can be expanded)
     const fileExtension = path.extname(filePath).toLowerCase();
     let languageHint = '';
-    if (['.js', '.ts', '.jsx', '.tsx'].includes(fileExtension)) languageHint = 'JavaScript/TypeScript';
-    else if (['.py'].includes(fileExtension)) languageHint = 'Python';
-    else if (['.java'].includes(fileExtension)) languageHint = 'Java';
+    if (['.js', '.ts', '.jsx', '.tsx'].includes(fileExtension)) {languageHint = 'JavaScript/TypeScript';}
+    else if (['.py'].includes(fileExtension)) {languageHint = 'Python';}
+    else if (['.java'].includes(fileExtension)) {languageHint = 'Java';}
     // Add more language hints as needed
 
     try {

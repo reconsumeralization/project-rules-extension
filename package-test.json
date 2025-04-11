@@ -1,0 +1,26 @@
+{
+  "name": "project-rules-extension-test",
+  "displayName": "Project Rules Test",
+  "version": "0.1.0",
+  "description": "Test version of Project Rules Extension focused on AI functionality",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "main": "./dist/extension-test.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      {
+        "command": "projectRules.testAiIntegration",
+        "title": "Test AI Rule Suggestion",
+        "category": "Project Rules Test"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package-test",
+    "compile-test": "webpack --config webpack-test.config.js",
+    "watch-test": "webpack --watch --config webpack-test.config.js",
+    "package-test": "webpack --mode production --devtool hidden-source-map --config webpack-test.config.js"
+  }
+} 

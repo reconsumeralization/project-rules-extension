@@ -207,3 +207,7 @@ async function triggerAiCycleCommand(): Promise<void> {
         }
     });
 } 
+
+export function initialize(context: vscode.ExtensionContext, aiAutonomyService: AiAutonomyService) {
+  throw new Error('Function not implemented.');
+}

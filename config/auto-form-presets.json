@@ -1,0 +1,79 @@
+{
+  "custom-presets": {
+    "taskmaster-implementation-with-mcp": {
+      "taskmaster": {
+        "version": "enhanced",
+        "action": "default",
+        "phase": "implementation",
+        "options": ["mcp-integrate"],
+        "taskId": "",
+        "submitAction": "run"
+      }
+    },
+    "taskmaster-doc-task-analysis": {
+      "taskmaster": {
+        "version": "enhanced",
+        "action": "analyze",
+        "phase": "none",
+        "options": ["mcp-integrate"],
+        "taskId": "doc001",
+        "submitAction": "run"
+      }
+    },
+    "documentation-deep-analysis": {
+      "doc-analysis": {
+        "module": "taskmaster",
+        "reportFormat": "markdown",
+        "options": ["interactive", "fix-terminology"],
+        "submitAction": "run"
+      }
+    },
+    "full-terminology-scan": {
+      "terminology": {
+        "action": "check",
+        "options": [],
+        "submitAction": "run"
+      }
+    },
+    "ci-documentation-check": {
+      "doc-analysis": {
+        "module": "all",
+        "reportFormat": "json",
+        "options": [],
+        "submitAction": "run"
+      }
+    },
+    "daily-progress-report": {
+      "taskmaster": {
+        "version": "enhanced",
+        "action": "default",
+        "phase": "none",
+        "options": ["progress-report"],
+        "taskId": "",
+        "submitAction": "run"
+      }
+    }
+  },
+  "workflows": {
+    "documentation-quality-check": [
+      {
+        "name": "Run terminology check",
+        "preset": "full-terminology-scan"
+      },
+      {
+        "name": "Run documentation analysis",
+        "preset": "documentation-deep-analysis"
+      }
+    ],
+    "implementation-phase-setup": [
+      {
+        "name": "Generate progress report",
+        "preset": "daily-progress-report"
+      },
+      {
+        "name": "Set up implementation phase",
+        "preset": "taskmaster-implementation-with-mcp"
+      }
+    ]
+  }
+} 

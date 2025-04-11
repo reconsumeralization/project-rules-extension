@@ -1,0 +1,98 @@
+[
+  {
+    "id": "16645323",
+    "title": "Implement TypeScript event handlers",
+    "description": "Add TypeScript interface for event handlers to improve type safety and developer experience.",
+    "status": "in-progress",
+    "priority": "high",
+    "parentId": null,
+    "phase": "implementation",
+    "createdAt": 1744331095253,
+    "updatedAt": 1744331095263,
+    "completedAt": null
+  },
+  {
+    "id": "f153228d",
+    "title": "Add unit tests for event handlers",
+    "description": "Create comprehensive test suite for the newly implemented event handlers.",
+    "status": "todo",
+    "priority": "medium",
+    "parentId": null,
+    "phase": "testing",
+    "createdAt": 1744331095255,
+    "updatedAt": 1744331095255,
+    "completedAt": null
+  },
+  {
+    "id": "23727e39",
+    "title": "Update documentation",
+    "description": "Update README and add inline comments for the new event handler functionality.",
+    "status": "todo",
+    "priority": "low",
+    "parentId": null,
+    "phase": "documentation",
+    "createdAt": 1744331095256,
+    "updatedAt": 1744331095256,
+    "completedAt": null
+  },
+  {
+    "id": "206d84c6",
+    "title": "Setup CI/CD pipeline",
+    "description": "Configure GitHub Actions workflow for continuous integration and deployment.",
+    "status": "todo",
+    "priority": "critical",
+    "parentId": null,
+    "phase": "devops",
+    "createdAt": 1744331095257,
+    "updatedAt": 1744331095257,
+    "completedAt": null
+  },
+  {
+    "id": "b5a0453a",
+    "title": "Refactor synchronization logic",
+    "description": "Improve the rule synchronization mechanism for better performance and reliability.",
+    "status": "todo",
+    "priority": "high",
+    "parentId": null,
+    "phase": "implementation",
+    "createdAt": 1744331095258,
+    "updatedAt": 1744331095258,
+    "completedAt": null
+  },
+  {
+    "id": "29d24130",
+    "title": "Define event handler interfaces",
+    "description": "Create TypeScript interfaces for different event handler types.",
+    "status": "todo",
+    "priority": "medium",
+    "parentId": "16645323",
+    "phase": "implementation",
+    "createdAt": 1744331095259,
+    "updatedAt": 1744331095259,
+    "completedAt": null
+  },
+  {
+    "id": "2c36db1d",
+    "title": "Implement event propagation",
+    "description": "Add functionality to propagate events through component hierarchy.",
+    "status": "todo",
+    "priority": "high",
+    "parentId": "16645323",
+    "phase": "implementation",
+    "createdAt": 1744331095260,
+    "updatedAt": 1744331095260,
+    "completedAt": null
+  },
+  {
+    "id": "a6b76891",
+    "title": "Add event cancellation support",
+    "description": "Implement the ability to cancel event propagation.",
+    "status": "todo",
+    "priority": "low",
+    "parentId": "16645323",
+    "phase": "implementation",
+    "createdAt": 1744331095261,
+    "updatedAt": 1744331095261,
+    "completedAt": null
+  }
+]

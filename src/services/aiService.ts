@@ -44,7 +44,7 @@ export class AiService {
       async (progress) => {
         progress.report({ increment: 0, message: 'Preparing request...' });
         const apiKey = await this._getApiKey();
-        if (!apiKey) throw new Error('AI API key is required and was not provided.');
+        if (!apiKey) {throw new Error('AI API key is required and was not provided.');}
         const modelName = this._getModelName();
         progress.report({ message: `Getting API Key & Model (${modelName})...` });
         try {
@@ -73,10 +73,10 @@ export class AiService {
           return parsedResult;
         } catch (error) {
           console.error('Error in AI analysis:', error);
-          if (error instanceof Error && error.message.includes('status code: 401')) throw new Error(`AI request failed (401 Unauthorized). Check API Key.`);
-          if (error instanceof Error && error.message.includes('status code: 404')) throw new Error(`AI request failed (404 Not Found). Check Model Name/Endpoint.`);
-          if (error instanceof Error && error.message.includes('status code:')) throw new Error(`AI request failed: ${error.message}. Check Key, Model, Network.`);
-          if (error instanceof Error) throw new Error(`AI analysis error: ${error.message}`);
+          if (error instanceof Error && error.message.includes('status code: 401')) {throw new Error(`AI request failed (401 Unauthorized). Check API Key.`);}
+          if (error instanceof Error && error.message.includes('status code: 404')) {throw new Error(`AI request failed (404 Not Found). Check Model Name/Endpoint.`);}
+          if (error instanceof Error && error.message.includes('status code:')) {throw new Error(`AI request failed: ${error.message}. Check Key, Model, Network.`);}
+          if (error instanceof Error) {throw new Error(`AI analysis error: ${error.message}`);}
           throw new Error(`Unknown AI analysis error.`);
         }
       }
@@ -129,7 +129,7 @@ export class AiService {
   }
 
   private _extractContentFromResponse(response: any): string | object | null {
-    if (response?.choices?.[0]?.message?.content) return response.choices[0].message.content.trim();
+    if (response?.choices?.[0]?.message?.content) {return response.choices[0].message.content.trim();}
     console.warn("AiService: Could not extract expected content.", JSON.stringify(response));
     return null;
   }

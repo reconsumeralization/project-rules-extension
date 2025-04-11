@@ -2,6 +2,8 @@
 
 This document explains how to use the tradeoff analysis feature in the Enhanced Taskmaster workflow to evaluate different implementation approaches and make informed decisions.
 
+> **Note:** For a detailed technical breakdown of the workflow process, see [Tradeoff Analysis Workflow](./tradeoff-analysis-workflow.md).
+
 ## Overview
 
 Tradeoff analysis is a structured approach to evaluating different implementation options for a task by analyzing benefits and drawbacks. The Taskmaster tradeoff analysis feature:

@@ -227,6 +227,7 @@ The server comes with default protocols:
 Protocols can be created through:
 
 1. The API:
+
 ```bash
 curl -X POST http://localhost:3000/api/protocols \
   -H "Content-Type: application/json" \

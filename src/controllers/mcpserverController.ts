@@ -135,3 +135,7 @@ async function getAgentCount(): Promise<number> {
   const agents = await agentService.getAgents(); 
   return agents.length;
 }
+
+export function initialize(context: vscode.ExtensionContext, serverService: ServerService) {
+  throw new Error('Function not implemented.');
+}

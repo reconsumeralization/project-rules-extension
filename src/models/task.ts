@@ -75,7 +75,7 @@ export function createTask({
  * Generates a display string for the task's due date.
  */
 export function getTaskDueDateDisplay(task: Task): string {
-  if (!task.metadata.dueDate) return 'No due date'
+  if (!task.metadata.dueDate) {return 'No due date'}
   
   const dueDate = new Date(task.metadata.dueDate)
   return dueDate.toLocaleDateString()
@@ -110,8 +110,8 @@ export function getTaskPriorityClass(priority: TaskPriority): string {
  * Checks if a task is overdue.
  */
 export function isTaskOverdue(task: Task): boolean {
-  if (!task.metadata.dueDate) return false
-  if (task.status === 'completed') return false
+  if (!task.metadata.dueDate) {return false}
+  if (task.status === 'completed') {return false}
   
   return Date.now() > task.metadata.dueDate
 }
@@ -130,7 +130,7 @@ export function sortTasks(tasks: Task[]): Task[] {
     }
     
     const statusDiff = statusOrder[a.status] - statusOrder[b.status]
-    if (statusDiff !== 0) return statusDiff
+    if (statusDiff !== 0) {return statusDiff}
     
     // Then by priority (critical first)
     const priorityOrder: Record<TaskPriority, number> = {
@@ -141,7 +141,7 @@ export function sortTasks(tasks: Task[]): Task[] {
     }
     
     const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority]
-    if (priorityDiff !== 0) return priorityDiff
+    if (priorityDiff !== 0) {return priorityDiff}
     
     // Then by due date (earlier first, null dates last)
     if (a.metadata.dueDate && b.metadata.dueDate) {

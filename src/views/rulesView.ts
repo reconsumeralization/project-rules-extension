@@ -141,8 +141,8 @@ export class RulesViewProvider implements vscode.TreeDataProvider<RuleTreeItem> 
         if ('metadata' in a && 'metadata' in b) {
           return a.metadata.filename.localeCompare(b.metadata.filename)
         }
-        if ('metadata' in a && !('metadata' in b)) return -1
-        if (!('metadata' in a) && 'metadata' in b) return 1
+        if ('metadata' in a && !('metadata' in b)) {return -1}
+        if (!('metadata' in a) && 'metadata' in b) {return 1}
         return 0
       })
 

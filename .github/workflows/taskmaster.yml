@@ -1,0 +1,123 @@
+# Taskmaster Integration
+#
+# NOTE: This workflow uses GitHub Actions:
+# - actions/checkout@v4        (Latest major version: v4.2.2)
+# - actions/setup-node@v4      (Latest major version: v4.3.0)
+# - peter-evans/create-pull-request@v7 (Latest major version: v7.0.8)
+# - actions/upload-artifact@v4 (Latest major version: v4.6.2)
+#
+# If you see linter errors in your local environment related to these actions,
+# it may be due to your local GitHub Actions schema validation not being updated.
+# These versions are valid and work correctly in GitHub Actions.
+#
+# For lint-free editing in VS Code/Cursor, run: npm run lint:fix-github-actions
+# This will update your local schema validation to support these versions.
+
+name: Taskmaster Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: "Task ID to complete"
+        required: false
+        default: ""
+      action:
+        description: "Action to perform"
+        required: true
+        default: "check"
+        type: choice
+        options:
+          - check
+          - start-next
+          - complete-current
+          - init
+
+jobs:
+  taskmaster:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Initialize Taskmaster (if needed)
+        run: |
+          mkdir -p ./data/taskmaster
+          if [ ! -f ./data/taskmaster/tasks.json ]; then
+            echo "Initializing Taskmaster storage..."
+            node scripts/taskmaster-init.js
+          else
+            echo "Taskmaster storage already exists."
+          fi
+
+      - name: Initialize Taskmaster (if requested)
+        if: ${{ github.event.inputs.action == 'init' }}
+        run: |
+          echo "Reinitializing Taskmaster storage..."
+          node scripts/taskmaster-init.js
+
+      - name: Check Current Tasks
+        if: ${{ github.event.inputs.action == 'check' || github.event.inputs.action == '' }}
+        run: |
+          echo "Checking current tasks..."
+          node scripts/taskmaster-workflow.js --dashboard
+
+      - name: Start Next Task
+        if: ${{ github.event.inputs.action == 'start-next' }}
+        run: |
+          echo "Starting next available task..."
+          node scripts/taskmaster-workflow.js --auto
+
+      - name: Complete Current Task
+        if: ${{ github.event.inputs.action == 'complete-current' }}
+        run: |
+          echo "Completing current task..."
+          if [ -n "${{ github.event.inputs.task_id }}" ]; then
+            echo "TASK_ID=${{ github.event.inputs.task_id }}" >> $GITHUB_ENV
+          else
+            CURRENT_TASK_JSON=$(node scripts/taskmaster-storage-cli.js current)
+            TASK_ID=$(echo $CURRENT_TASK_JSON | jq -r '.id')
+            echo "TASK_ID=${TASK_ID:-unknown}" >> $GITHUB_ENV
+          fi
+          node scripts/taskmaster-workflow.js --auto --complete-current
+
+      - name: Work on Specific Task
+        if: ${{ github.event.inputs.task_id != '' && github.event.inputs.action != 'init' }}
+        run: |
+          echo "Working on task #${{ github.event.inputs.task_id }}..."
+          echo "TASK_ID=${{ github.event.inputs.task_id }}" >> $GITHUB_ENV
+          node scripts/taskmaster-workflow.js --auto --task=${{ github.event.inputs.task_id }}
+
+      - name: Create Pull Request for completed tasks
+        if: ${{ github.event.inputs.action == 'complete-current' && github.event_name != 'pull_request' }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Taskmaster: Complete task ${{ env.TASK_ID }}"
+          title: "Taskmaster: Complete task ${{ env.TASK_ID }}"
+          body: |
+            This PR was automatically created by the Taskmaster GitHub Action.
+
+            Task ${{ env.TASK_ID }} has been marked as completed.
+          branch: taskmaster-automation
+          base: main
+
+      - name: Upload Taskmaster data as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskmaster-data
+          path: ./data/taskmaster/
+          retention-days: 7

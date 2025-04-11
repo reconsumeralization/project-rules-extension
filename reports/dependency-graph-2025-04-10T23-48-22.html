@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dependency Graph</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    #container {
+      display: flex;
+      height: 100vh;
+    }
+    #graph {
+      flex: 1;
+      background-color: white;
+      border-right: 1px solid #ddd;
+    }
+    #sidebar {
+      width: 300px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .node {
+      cursor: pointer;
+    }
+    .link {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+    .link.cyclic {
+      stroke: red;
+      stroke-width: 2px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 20px;
+    }
+    .stats {
+      margin-bottom: 20px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .info-panel {
+      background-color: white;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .cycle-item {
+      color: red;
+      margin-bottom: 10px;
+    }
+    .controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: rgba(255,255,255,0.8);
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    button {
+      margin-right: 5px;
+      padding: 5px 10px;
+      border: none;
+      background-color: #4a5568;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2d3748;
+    }
+    .legend {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-right: 15px;
+    }
+    .legend-color {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="graph"></div>
+    <div id="sidebar">
+      <h1>Dependency Graph</h1>
+      
+      <div class="stats">
+        <h2>Statistics</h2>
+        <div id="stats-content"></div>
+      </div>
+      
+      <div class="info-panel">
+        <h2>Selected Node</h2>
+        <div id="node-info">Select a node to see details</div>
+      </div>
+      
+      <div class="info-panel" style="margin-top: 20px;">
+        <h2>Circular Dependencies</h2>
+        <div id="cycles-list"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #90cdf4;"></div>
+        <span>Internal</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #cbd5e0;"></div>
+        <span>External</span>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background-color: #f56565; width: 30px; height: 2px;"></div>
+        <span>Circular</span>
+      </div>
+    </div>
+    <button id="zoom-in">Zoom In</button>
+    <button id="zoom-out">Zoom Out</button>
+    <button id="reset">Reset</button>
+  </div>
+  
+  <script>
+    // Graph data
+    const graphData = {
+  "nodes": [
+    {
+      "id": "n0",
+      "name": "eslint.config.js",
+      "path": "eslint.config.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n1",
+      "name": "MCPServerAgents.js",
+      "path": "media\\MCPServerAgents.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n2",
+      "name": "MCPServerView.js",
+      "path": "media\\MCPServerView.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n3",
+      "name": "rulesView.js",
+      "path": "media\\rulesView.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n4",
+      "name": "syncView.js",
+      "path": "media\\syncView.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n5",
+      "name": "tasksView.js",
+      "path": "media\\tasksView.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n6",
+      "name": "automated-form-proxy.js",
+      "path": "scripts\\automated-form-proxy.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n7",
+      "name": "code-style-analyzer.js",
+      "path": "scripts\\code-style-analyzer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n8",
+      "name": "code-style-fixer.js",
+      "path": "scripts\\code-style-fixer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n9",
+      "name": "dead-code-detector.js",
+      "path": "scripts\\dead-code-detector.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n10",
+      "name": "dependency-graph-generator.js",
+      "path": "scripts\\dependency-graph-generator.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n11",
+      "name": "dependency-vulnerability-checker.js",
+      "path": "scripts\\dependency-vulnerability-checker.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n12",
+      "name": "doc-analysis-tool.js",
+      "path": "scripts\\doc-analysis-tool.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n13",
+      "name": "doc-code-analyzer.js",
+      "path": "scripts\\doc-code-analyzer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n14",
+      "name": "docs-manager.js",
+      "path": "scripts\\docs-manager.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n15",
+      "name": "documentation-analysis.js",
+      "path": "scripts\\documentation-analysis.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n16",
+      "name": "documentation-analyzer.js",
+      "path": "scripts\\documentation-analyzer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n17",
+      "name": "interactive-docs-fixer.js",
+      "path": "scripts\\interactive-docs-fixer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n18",
+      "name": "make-scripts-executable.js",
+      "path": "scripts\\make-scripts-executable.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n19",
+      "name": "taskmaster-autonomous.js",
+      "path": "scripts\\taskmaster-autonomous.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n20",
+      "name": "taskmaster-enhanced.js",
+      "path": "scripts\\taskmaster-enhanced.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n21",
+      "name": "taskmaster-reporter.js",
+      "path": "scripts\\taskmaster-reporter.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n22",
+      "name": "taskmaster-scheduler.js",
+      "path": "scripts\\taskmaster-scheduler.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n23",
+      "name": "taskmaster-workflow.js",
+      "path": "scripts\\taskmaster-workflow.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n24",
+      "name": "terminology-checker.js",
+      "path": "scripts\\terminology-checker.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n25",
+      "name": "terminology-fixer.js",
+      "path": "scripts\\terminology-fixer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n26",
+      "name": "test-case-generator.js",
+      "path": "scripts\\test-case-generator.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n27",
+      "name": "test-coverage-analyzer.js",
+      "path": "scripts\\test-coverage-analyzer.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n28",
+      "name": "update-github-actions-schema.js",
+      "path": "scripts\\update-github-actions-schema.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n29",
+      "name": "user-proxy-form-component.js",
+      "path": "scripts\\user-proxy-form-component.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n30",
+      "name": "user-proxy-form.js",
+      "path": "scripts\\user-proxy-form.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n31",
+      "name": "verify-tradeoff-docs.js",
+      "path": "scripts\\verify-tradeoff-docs.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n32",
+      "name": "agentController.ts",
+      "path": "src\\controllers\\agentController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n33",
+      "name": "serverService.ts",
+      "path": "src\\services\\serverService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n34",
+      "name": "aiAutonomyController.ts",
+      "path": "src\\controllers\\aiAutonomyController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n35",
+      "name": "aiAutonomyService.ts",
+      "path": "src\\services\\aiAutonomyService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n36",
+      "name": "contextRuleController.ts",
+      "path": "src\\controllers\\contextRuleController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n37",
+      "name": "utils.ts",
+      "path": "src\\utils.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n38",
+      "name": "mcpserverController.ts",
+      "path": "src\\controllers\\mcpserverController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n39",
+      "name": "mcpAgentsView.ts",
+      "path": "src\\views\\mcpAgentsView.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n40",
+      "name": "notepadController.ts",
+      "path": "src\\controllers\\notepadController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n41",
+      "name": "ruleController.ts",
+      "path": "src\\controllers\\ruleController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n42",
+      "name": "rule.ts",
+      "path": "src\\models\\rule.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n43",
+      "name": "localStorageService.ts",
+      "path": "src\\services\\localStorageService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n44",
+      "name": "syncController.ts",
+      "path": "src\\controllers\\syncController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n45",
+      "name": "taskController.ts",
+      "path": "src\\controllers\\taskController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n46",
+      "name": "task.ts",
+      "path": "src\\models\\task.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n47",
+      "name": "taskService.ts",
+      "path": "src\\services\\taskService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n48",
+      "name": "errors.ts",
+      "path": "src\\errors.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n49",
+      "name": "extension-minimal.ts",
+      "path": "src\\extension-minimal.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n50",
+      "name": "extension-test-minimal.ts",
+      "path": "src\\extension-test-minimal.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n51",
+      "name": "extension-test.ts",
+      "path": "src\\extension-test.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n52",
+      "name": "extension.ts",
+      "path": "src\\extension.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n53",
+      "name": "tasksView.ts",
+      "path": "src\\views\\tasksView.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n54",
+      "name": "agent.ts",
+      "path": "src\\models\\agent.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n55",
+      "name": "mcp.ts",
+      "path": "src\\models\\mcp.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n56",
+      "name": "notepad.ts",
+      "path": "src\\models\\notepad.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n57",
+      "name": "sync.ts",
+      "path": "src\\models\\sync.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n58",
+      "name": "agentService.ts",
+      "path": "src\\services\\agentService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n59",
+      "name": "aiService.ts",
+      "path": "src\\services\\aiService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n60",
+      "name": "cacheService.ts",
+      "path": "src\\services\\cacheService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n61",
+      "name": "mcpAgentService.ts",
+      "path": "src\\services\\mcpAgentService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n62",
+      "name": "mcpProtocolService.ts",
+      "path": "src\\services\\mcpProtocolService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n63",
+      "name": "mcpService.ts",
+      "path": "src\\services\\mcpService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n64",
+      "name": "mockServerService.ts",
+      "path": "src\\services\\mockServerService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n65",
+      "name": "notepadAIService.ts",
+      "path": "src\\services\\notepadAIService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n66",
+      "name": "notepadService.ts",
+      "path": "src\\services\\notepadService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n67",
+      "name": "protocolService.ts",
+      "path": "src\\services\\protocolService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n68",
+      "name": "protocolValidator.ts",
+      "path": "src\\utils\\protocolValidator.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n69",
+      "name": "taskAiService.ts",
+      "path": "src\\services\\taskAiService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n70",
+      "name": "runTest.js",
+      "path": "src\\test\\runTest.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n71",
+      "name": "extension.test.ts",
+      "path": "src\\test\\suite\\extension.test.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n72",
+      "name": "index.ts",
+      "path": "src\\test\\suite\\index.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n73",
+      "name": "eventHandlers.ts",
+      "path": "src\\utils\\eventHandlers.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n74",
+      "name": "mcpView.ts",
+      "path": "src\\views\\mcpView.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n75",
+      "name": "notepadView-provider.ts",
+      "path": "src\\views\\notepadView-provider.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n76",
+      "name": "rulesView-provider.ts",
+      "path": "src\\views\\rulesView-provider.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n77",
+      "name": "rulesView.ts",
+      "path": "src\\views\\rulesView.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n78",
+      "name": "syncView.ts",
+      "path": "src\\views\\syncView.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n79",
+      "name": "index.tsx",
+      "path": "src\\views\\webview-ui\\mcpProtocolView\\index.tsx",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n80",
+      "name": "mcpProtocolView-ui.tsx",
+      "path": "src\\views\\webview-ui\\mcpProtocolView-ui.tsx",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n81",
+      "name": "index.tsx",
+      "path": "src\\views\\webview-ui\\notepadView\\index.tsx",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n82",
+      "name": "notepadView-ui.tsx",
+      "path": "src\\views\\webview-ui\\notepadView-ui.tsx",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n83",
+      "name": "index.tsx",
+      "path": "src\\views\\webview-ui\\rulesView\\index.tsx",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n84",
+      "name": "rulesView-ui.tsx",
+      "path": "src\\views\\webview-ui\\rulesView-ui.tsx",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n85",
+      "name": "webpack-test-minimal.config.js",
+      "path": "webpack-test-minimal.config.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n86",
+      "name": "webpack-test.config.js",
+      "path": "webpack-test.config.js",
+      "type": "javascript",
+      "isExternal": false
+    },
+    {
+      "id": "n87",
+      "name": "webpack.config.js",
+      "path": "webpack.config.js",
+      "type": "javascript",
+      "isExternal": false
+    }
+  ],
+  "links": [
+    {
+      "source": "n32",
+      "target": "n33",
+      "isCyclic": false
+    },
+    {
+      "source": "n33",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n33",
+      "target": "n61",
+      "isCyclic": false
+    },
+    {
+      "source": "n33",
+      "target": "n48",
+      "isCyclic": false
+    },
+    {
+      "source": "n34",
+      "target": "n35",
+      "isCyclic": false
+    },
+    {
+      "source": "n35",
+      "target": "n41",
+      "isCyclic": false
+    },
+    {
+      "source": "n35",
+      "target": "n46",
+      "isCyclic": false
+    },
+    {
+      "source": "n35",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n36",
+      "target": "n33",
+      "isCyclic": false
+    },
+    {
+      "source": "n36",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n38",
+      "target": "n39",
+      "isCyclic": false
+    },
+    {
+      "source": "n39",
+      "target": "n61",
+      "isCyclic": false
+    },
+    {
+      "source": "n39",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n41",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n41",
+      "target": "n33",
+      "isCyclic": false
+    },
+    {
+      "source": "n41",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n41",
+      "target": "n43",
+      "isCyclic": false
+    },
+    {
+      "source": "n41",
+      "target": "n33",
+      "isCyclic": false
+    },
+    {
+      "source": "n43",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n44",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n44",
+      "target": "n33",
+      "isCyclic": false
+    },
+    {
+      "source": "n44",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n45",
+      "target": "n46",
+      "isCyclic": false
+    },
+    {
+      "source": "n45",
+      "target": "n47",
+      "isCyclic": false
+    },
+    {
+      "source": "n46",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n47",
+      "target": "n46",
+      "isCyclic": false
+    },
+    {
+      "source": "n52",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n52",
+      "target": "n53",
+      "isCyclic": false
+    },
+    {
+      "source": "n52",
+      "target": "n39",
+      "isCyclic": false
+    },
+    {
+      "source": "n53",
+      "target": "n46",
+      "isCyclic": false
+    },
+    {
+      "source": "n58",
+      "target": "n55",
+      "isCyclic": false
+    },
+    {
+      "source": "n61",
+      "target": "n33",
+      "isCyclic": false
+    },
+    {
+      "source": "n62",
+      "target": "n55",
+      "isCyclic": false
+    },
+    {
+      "source": "n63",
+      "target": "n55",
+      "isCyclic": false
+    },
+    {
+      "source": "n65",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n66",
+      "target": "n56",
+      "isCyclic": false
+    },
+    {
+      "source": "n66",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n67",
+      "target": "n55",
+      "isCyclic": false
+    },
+    {
+      "source": "n67",
+      "target": "n68",
+      "isCyclic": false
+    },
+    {
+      "source": "n68",
+      "target": "n55",
+      "isCyclic": false
+    },
+    {
+      "source": "n69",
+      "target": "n46",
+      "isCyclic": false
+    },
+    {
+      "source": "n69",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n74",
+      "target": "n62",
+      "isCyclic": false
+    },
+    {
+      "source": "n75",
+      "target": "n65",
+      "isCyclic": false
+    },
+    {
+      "source": "n76",
+      "target": "n37",
+      "isCyclic": false
+    },
+    {
+      "source": "n77",
+      "target": "n41",
+      "isCyclic": false
+    },
+    {
+      "source": "n77",
+      "target": "n42",
+      "isCyclic": false
+    },
+    {
+      "source": "n77",
+      "target": "n35",
+      "isCyclic": false
+    },
+    {
+      "source": "n77",
+      "target": "n43",
+      "isCyclic": false
+    },
+    {
+      "source": "n79",
+      "target": "n73",
+      "isCyclic": false
+    },
+    {
+      "source": "n80",
+      "target": "n79",
+      "isCyclic": false
+    },
+    {
+      "source": "n81",
+      "target": "n56",
+      "isCyclic": false
+    },
+    {
+      "source": "n82",
+      "target": "n81",
+      "isCyclic": false
+    },
+    {
+      "source": "n84",
+      "target": "n83",
+      "isCyclic": false
+    }
+  ],
+  "cycles": []
+};
+    
+    // Set up the visualization
+    const width = document.getElementById('graph').clientWidth;
+    const height = document.getElementById('graph').clientHeight;
+    
+    // Create SVG
+    const svg = d3.select('#graph')
+      .append('svg')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .call(d3.zoom().on('zoom', (event) => {
+        g.attr('transform', event.transform);
+      }))
+      .append('g');
+    
+    const g = svg.append('g');
+    
+    // Create the force simulation
+    const simulation = d3.forceSimulation(graphData.nodes)
+      .force('link', d3.forceLink(graphData.links).id(d => d.id).distance(100))
+      .force('charge', d3.forceManyBody().strength(-300))
+      .force('center', d3.forceCenter(width / 2, height / 2));
+    
+    // Create links
+    const link = g.append('g')
+      .selectAll('line')
+      .data(graphData.links)
+      .enter()
+      .append('line')
+      .attr('class', d => d.isCyclic ? 'link cyclic' : 'link');
+    
+    // Create nodes
+    const node = g.append('g')
+      .selectAll('circle')
+      .data(graphData.nodes)
+      .enter()
+      .append('circle')
+      .attr('class', 'node')
+      .attr('r', 8)
+      .attr('fill', d => d.isExternal ? '#cbd5e0' : '#90cdf4')
+      .call(d3.drag()
+        .on('start', dragstarted)
+        .on('drag', dragged)
+        .on('end', dragended));
+    
+    // Add node labels
+    const label = g.append('g')
+      .selectAll('text')
+      .data(graphData.nodes)
+      .enter()
+      .append('text')
+      .attr('dx', 12)
+      .attr('dy', '.35em')
+      .text(d => d.name);
+    
+    // Set up simulation tick
+    simulation.on('tick', () => {
+      link
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+      
+      node
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y);
+      
+      label
+        .attr('x', d => d.x)
+        .attr('y', d => d.y);
+    });
+    
+    // Drag functions
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+    
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+    
+    // Node click event
+    node.on('click', (event, d) => {
+      // Show node info in sidebar
+      const nodeInfo = document.getElementById('node-info');
+      
+      // Find incoming and outgoing dependencies
+      const outgoing = graphData.links.filter(link => link.source.id === d.id || link.source === d.id);
+      const incoming = graphData.links.filter(link => link.target.id === d.id);
+      
+      // Generate the HTML content without nested template literals
+      let outgoingItems = '';
+      outgoing.forEach(link => {
+        const targetNode = typeof link.target === 'object'
+          ? link.target
+          : graphData.nodes.find(n => n.id === link.target);
+        if (targetNode) {
+          outgoingItems += '<li>' + targetNode.name + (link.isCyclic ? ' <span style="color: red;">(circular)</span>' : '') + '</li>';
+        }
+      });
+      
+      let incomingItems = '';
+      incoming.forEach(link => {
+        const sourceNode = typeof link.source === 'object'
+          ? link.source
+          : graphData.nodes.find(n => n.id === link.source);
+        if (sourceNode) {
+          incomingItems += '<li>' + sourceNode.name + (link.isCyclic ? ' <span style="color: red;">(circular)</span>' : '') + '</li>';
+        }
+      });
+      
+      nodeInfo.innerHTML = 
+        '<div>' +
+          '<p><strong>Name:</strong> ' + d.name + '</p>' +
+          '<p><strong>Path:</strong> ' + d.path + '</p>' +
+          '<p><strong>Type:</strong> ' + d.type + '</p>' +
+          '<p><strong>Dependencies (' + outgoing.length + '):</strong></p>' +
+          '<ul>' + outgoingItems + '</ul>' +
+          '<p><strong>Dependents (' + incoming.length + '):</strong></p>' +
+          '<ul>' + incomingItems + '</ul>' +
+        '</div>';
+    });
+    
+    // Populate statistics
+    const statsContent = document.getElementById('stats-content');
+    const internalNodes = graphData.nodes.filter(n => !n.isExternal).length;
+    const externalNodes = graphData.nodes.filter(n => n.isExternal).length;
+    const cyclicLinks = graphData.links.filter(l => l.isCyclic).length;
+    
+    statsContent.innerHTML = 
+      '<div>' +
+        '<p><strong>Total Files:</strong> ' + internalNodes + '</p>' +
+        '<p><strong>External Dependencies:</strong> ' + externalNodes + '</p>' +
+        '<p><strong>Total Dependencies:</strong> ' + graphData.links.length + '</p>' +
+        '<p><strong>Circular Dependencies:</strong> ' + cyclicLinks + '</p>' +
+      '</div>';
+    
+    // Populate cycles list
+    const cyclesList = document.getElementById('cycles-list');
+    
+    if (graphData.cycles && graphData.cycles.length > 0) {
+      let cyclesHtml = '<ul>';
+      graphData.cycles.forEach(cycle => {
+        cyclesHtml += '<li class="cycle-item">' + cycle.join(' → ') + '</li>';
+      });
+      cyclesHtml += '</ul>';
+      cyclesList.innerHTML = cyclesHtml;
+    } else {
+      cyclesList.innerHTML = '<p>No circular dependencies detected.</p>';
+    }
+    
+    // Control buttons
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      const transform = d3.zoomTransform(svg.node());
+      svg.call(d3.zoom().transform, transform.scale(transform.k * 1.2));
+    });
+    
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      const transform = d3.zoomTransform(svg.node());
+      svg.call(d3.zoom().transform, transform.scale(transform.k * 0.8));
+    });
+    
+    document.getElementById('reset').addEventListener('click', () => {
+      svg.call(d3.zoom().transform, d3.zoomIdentity);
+    });
+  </script>
+</body>
+</html>

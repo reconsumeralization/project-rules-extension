@@ -248,7 +248,7 @@ export class TasksViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _sendTasks(): void {
-    if (!this._view) return
+    if (!this._view) {return}
     
     const tasks = taskController.getTasks()
     const formattedTasks = tasks.map(this._formatTaskForWebview)
@@ -260,7 +260,7 @@ export class TasksViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _sendRules(): void {
-    if (!this._view) return
+    if (!this._view) {return}
     
     const rules = ruleController.getRules()
     const formattedRules = rules.map(rule => ({
@@ -275,7 +275,7 @@ export class TasksViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _sendUsers(): void {
-    if (!this._view) return
+    if (!this._view) {return}
     
     // This is a placeholder. In a real scenario, you might get users from another service
     // For now, we'll just send some sample users
@@ -357,7 +357,7 @@ export class TasksViewProvider implements vscode.WebviewViewProvider {
     
     // Read the HTML file from the media directory
     const htmlPath = vscode.Uri.joinPath(this._context.extensionUri, 'media', 'tasksView.html')
-    let html = ''
+    const html = ''
     
     try {
       // Instead of reading the file directly, we'll use a template approach

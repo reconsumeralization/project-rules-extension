@@ -219,7 +219,7 @@ export class McpAgentService {
    */
   public async updateCachedAgentStats(id: string, statsUpdate: Partial<McpAgent['stats']>): Promise<void> {
     const agentIndex = this._agents.findIndex(agent => agent.id === id)
-    if (agentIndex === -1) return;
+    if (agentIndex === -1) {return;}
     
     const agent = this._agents[agentIndex];
     if (!agent.stats) {

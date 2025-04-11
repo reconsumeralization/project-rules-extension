@@ -17,86 +17,14 @@
     "commands": [
       {
         "command": "projectRules.testCommand",
-        "title": "Test Extension Activation",
-        "category": "Project Rules"
+        "title": "Project Rules: Test Command"
       },
       {
-        "command": "projectRules.suggestRuleImprovements",
-        "title": "Project Rules: Suggest Rule Improvements",
-        "category": "Project Rules"
+        "command": "projectRules.openRulesView",
+        "title": "Project Rules: Open Rules View"
       },
       {
-        "command": "projectRules.fetchServerChanges",
-        "title": "Fetch Latest Rules From Server",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.createRule",
-        "title": "Create New Rule",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.syncRules",
-        "title": "Sync Rules",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.generateRuleFromFile",
-        "title": "Generate Rule From This File",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.createTask",
-        "title": "Create Task",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.createTaskWithAI",
-        "title": "Create Task Using AI",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.generateTasksForRule",
-        "title": "Generate Tasks For Rule",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.showTasks",
-        "title": "Show Tasks View",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.showTasksForRule",
-        "title": "Show Tasks for This Rule",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.openMcpAgentsView",
-        "title": "Show MCP Server Agents",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.refreshMcpAgents",
-        "title": "Refresh MCP Server Agents",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.refreshAgentStats",
-        "title": "Refresh Agent Statistics",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.refreshAllAgentStats",
-        "title": "Refresh Statistics for ALL Agents",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.approveSuggestedRule",
-        "title": "Approve AI Suggested Rule",
-        "category": "Project Rules"
-      },
-      {
-        "command": "projectRules.dismissSuggestedRule",
+        "command": "projectRules.dismissSuggestion",
         "title": "Dismiss AI Suggested Rule",
         "category": "Project Rules"
       },
@@ -108,12 +36,71 @@
       {
         "command": "projectRules.toggleAiAutonomy",
         "title": "Toggle AI Autonomy On/Off",
-        "category": "Project Rules"
+        "category": "Project Rules",
+        "icon": "$(settings)"
       },
       {
         "command": "projectRules.triggerAiCycle",
         "title": "Manually Trigger AI Autonomy Cycle",
         "category": "Project Rules"
+      },
+      {
+        "command": "projectRules.reloadRules",
+        "title": "Reload Project Rules",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "projectRules.syncRules",
+        "title": "Sync Rules with Server",
+        "icon": "$(cloud)"
+      },
+      {
+        "command": "projectRules.openRule",
+        "title": "Open Rule"
+      },
+      {
+        "command": "projectRules.createRule",
+        "title": "Create New Rule",
+        "icon": "$(add)"
+      },
+      {
+        "command": "projectRules.deleteRule",
+        "title": "Delete Rule",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "projectRules.suggestRuleImprovements",
+        "title": "Suggest Improvements",
+        "icon": "$(lightbulb)"
+      },
+      {
+        "command": "projectRules.exportRuleAsMarkdown",
+        "title": "Export Rule as Markdown",
+        "icon": "$(file-symlink-file)"
+      },
+      {
+        "command": "projectRules.checkForRuleViolations",
+        "title": "Check Rule Violations in Current File",
+        "icon": "$(verified)"
+      },
+      {
+        "command": "projectRules.applyTaskAction",
+        "title": "Apply Task Action"
+      },
+      {
+        "command": "projectRules.completeTask",
+        "title": "Mark Task Complete",
+        "icon": "$(check)"
+      },
+      {
+        "command": "projectRules.cancelTask",
+        "title": "Cancel Task",
+        "icon": "$(x)"
+      },
+      {
+        "command": "projectRules.reopenTask",
+        "title": "Reopen Task",
+        "icon": "$(debug-restart)"
       },
       {
         "command": "projectRules.assignTaskToMe",
@@ -125,6 +112,39 @@
         "title": "Estimate Task Complexity",
         "category": "Project Rules (Tasks)",
         "icon": "$(symbol-numeric)"
+      },
+      {
+        "command": "projectRules.openMcpServerView",
+        "title": "Open MCP Server View"
+      },
+      {
+        "command": "projectRules.startAgent",
+        "title": "Start Agent",
+        "icon": "$(play)"
+      },
+      {
+        "command": "projectRules.stopAgent",
+        "title": "Stop Agent",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "projectRules.configureAgent",
+        "title": "Configure Agent",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "projectRules.viewAgentLogs",
+        "title": "View Agent Logs",
+        "icon": "$(output)"
+      },
+      {
+        "command": "projectRules.openMcpProtocolEditor",
+        "title": "Open MCP Protocol Editor"
+      },
+      {
+        "command": "projectRules.demonstrateAiService",
+        "title": "Analyze Current File for Rule Suggestions",
+        "icon": "$(beaker)"
       }
     ],
     "configuration": {
@@ -201,12 +221,12 @@
     "menus": {
       "view/item/context": [
         {
-          "command": "projectRules.approveSuggestedRule",
+          "command": "projectRules.previewSuggestion",
           "when": "view == projectRules.rulesView && viewItem == aiSuggestion",
           "group": "inline@1"
         },
         {
-          "command": "projectRules.dismissSuggestedRule",
+          "command": "projectRules.dismissSuggestion",
           "when": "view == projectRules.rulesView && viewItem == aiSuggestion",
           "group": "inline@2"
         },
@@ -280,36 +300,149 @@
     }
   },
   "dependencies": {
-    "@vscode/codicons": "^0.0.35"
+    "@google/generative-ai": "^0.24.0",
+    "@vscode/codicons": "^0.0.35",
+    "dotenv": "^16.5.0",
+    "mime-types": "^3.0.1"
   },
   "devDependencies": {
-    "@types/vscode": "^1.80.0",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.0.0",
-    "webpack": "^5.99.5",
-    "webpack-cli": "^6.0.1",
+    "@babel/parser": "^7.27.0",
+    "@babel/traverse": "^7.27.0",
+    "@eslint/js": "^9.24.0",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-dropdown-menu": "^2.1.7",
     "@radix-ui/react-label": "^2.1.3",
     "@radix-ui/react-slot": "^1.2.0",
-    "class-variance-authority": "^0.7.1",
-    "lucide-react": "^0.487.0",
-    "next-themes": "^0.4.6",
-    "react-hook-form": "^7.55.0",
-    "sonner": "^2.0.3",
-    "vaul": "^1.1.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.10",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "chalk": "^5.4.1",
+    "class-variance-authority": "^0.7.1",
     "css-loader": "^6.8.1",
+    "eslint": "^9.24.0",
+    "file-loader": "^6.2.0",
+    "glob": "^11.0.1",
+    "js-yaml": "^4.1.0",
+    "lucide-react": "^0.487.0",
+    "mocha": "^11.1.0",
+    "next-themes": "^0.4.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.55.0",
+    "sonner": "^2.0.3",
     "style-loader": "^3.3.3",
-    "file-loader": "^6.2.0"
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.29.1",
+    "vaul": "^1.1.2",
+    "webpack": "^5.99.5",
+    "webpack-cli": "^6.0.1",
+    "yaml-language-server": "^1.17.0"
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "package": "webpack --mode production --devtool hidden-source-map"
+    "compile": "webpack --config webpack.config.js",
+    "watch": "webpack --watch --config webpack.config.js",
+    "test-minimal": "webpack --config webpack-test-minimal.config.js && code --extensionDevelopmentPath=.",
+    "eslint": "eslint src --ext ts",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "build:minimal": "webpack --config webpack-test-minimal.config.js",
+    "taskmaster": "node scripts/taskmaster-workflow.js",
+    "taskmaster:auto": "node scripts/taskmaster-workflow.js --auto",
+    "taskmaster:complete": "node scripts/taskmaster-workflow.js --auto --complete-current",
+    "taskmaster:task": "node scripts/taskmaster-workflow.js --task",
+    "taskmaster:dashboard": "node scripts/taskmaster-workflow.js --dashboard",
+    "taskmaster:enhanced": "node scripts/taskmaster-enhanced.js",
+    "taskmaster:phase-planning": "node scripts/taskmaster-enhanced.js --phase=planning",
+    "taskmaster:phase-design": "node scripts/taskmaster-enhanced.js --phase=design",
+    "taskmaster:phase-implementation": "node scripts/taskmaster-enhanced.js --phase=implementation",
+    "taskmaster:phase-testing": "node scripts/taskmaster-enhanced.js --phase=testing",
+    "taskmaster:phase-review": "node scripts/taskmaster-enhanced.js --phase=review",
+    "taskmaster:phase-deployment": "node scripts/taskmaster-enhanced.js --phase=deployment",
+    "taskmaster:analyze": "node scripts/taskmaster-enhanced.js --analyze-task",
+    "taskmaster:mcp": "node scripts/taskmaster-enhanced.js --mcp-integrate",
+    "taskmaster:progress": "node scripts/taskmaster-enhanced.js --progress-report",
+    "taskmaster:auto-enhanced": "node scripts/taskmaster-enhanced.js --auto --mcp-integrate",
+    "taskmaster:tradeoff": "node scripts/taskmaster-enhanced.js --tradeoff-analysis",
+    "taskmaster:tradeoff-task": "node scripts/taskmaster-enhanced.js --tradeoff-task",
+    "taskmaster:tradeoff-mcp": "node scripts/taskmaster-enhanced.js --tradeoff-analysis --mcp-integrate",
+    "taskmaster:autonomous": "node scripts/taskmaster-autonomous.js",
+    "taskmaster:autonomous-suggest": "node scripts/taskmaster-autonomous.js --suggest",
+    "taskmaster:autonomous-continue": "node scripts/taskmaster-autonomous.js --continue",
+    "taskmaster:autonomous-dashboard": "node scripts/taskmaster-autonomous.js --dashboard",
+    "taskmaster:autonomous-mcp": "node scripts/taskmaster-autonomous.js --mcp-integrate",
+    "taskmaster:init": "node scripts/taskmaster-init.js",
+    "taskmaster:storage-reset": "rm -rf ./data/taskmaster && mkdir -p ./data/taskmaster",
+    "taskmaster:storage-check": "cat ./data/taskmaster/tasks.json",
+    "taskmaster:cli": "node scripts/taskmaster-storage-cli.js",
+    "taskmaster:cli-list": "node scripts/taskmaster-storage-cli.js list",
+    "taskmaster:cli-current": "node scripts/taskmaster-storage-cli.js current",
+    "doc-analysis": "node scripts/doc-analysis-tool.js",
+    "doc-analysis:taskmaster": "node scripts/doc-analysis-tool.js --dir=docs/taskmaster/ --output=docs/taskmaster/fixes/doc-analysis-report.md --verbose",
+    "terminology:check": "node scripts/terminology-checker.js",
+    "terminology:check:html": "node scripts/terminology-checker.js --format=html",
+    "terminology:check:json": "node scripts/terminology-checker.js --format=json",
+    "terminology:check:verbose": "node scripts/terminology-checker.js --verbose",
+    "terminology:generate": "node scripts/terminology-checker.js --generate-reference --verbose",
+    "terminology:fix": "node scripts/terminology-checker.js --fix --verbose",
+    "terminology:report": "node scripts/terminology-checker.js --output=./docs/terminology-report.md --format=html",
+    "terminology:fix:interactive": "node scripts/terminology-fixer.js --interactive",
+    "terminology:fix:dry-run": "node scripts/terminology-fixer.js --dry-run",
+    "fix:documentation": "npm run doc-analysis && npm run terminology:check",
+    "user-proxy:interactive": "node scripts/user-proxy-form.js --interactive",
+    "user-proxy:auto-fix": "node scripts/user-proxy-form.js --auto-fix-all",
+    "user-proxy:fix-files": "node scripts/user-proxy-form.js --fix",
+    "user-proxy:fix-taskmaster": "node scripts/user-proxy-form.js --auto-fix-all --module=taskmaster",
+    "task:doc-disconnect": "npm run doc-analysis:taskmaster && npm run terminology:check && echo \"See documentation plan at docs/taskmaster/fixes/documentation-disconnect-plan.md\" && echo \"Run 'npm run terminology:fix:interactive' to fix terminology issues\"",
+    "task:doc-disconnect:complete": "node scripts/taskmaster-enhanced.js --task=doc001 --complete-current",
+    "proxy-form": "node scripts/user-proxy-form-component.js",
+    "proxy-form:web": "node scripts/user-proxy-form-component.js --render-mode=web",
+    "proxy-form:react": "node scripts/user-proxy-form-component.js --render-mode=react",
+    "proxy-form:export": "node scripts/user-proxy-form-component.js --export=./exports/form-definition.json",
+    "proxy-form:config": "node scripts/user-proxy-form-component.js --config=./config/proxy-form-config.json",
+    "auto-form": "node scripts/automated-form-proxy.js",
+    "auto-form:taskmaster": "node scripts/automated-form-proxy.js --form=taskmaster",
+    "auto-form:docs": "node scripts/automated-form-proxy.js --form=doc-analysis",
+    "auto-form:terminology": "node scripts/automated-form-proxy.js --form=terminology",
+    "auto-form:export-config": "node scripts/automated-form-proxy.js --export --form=taskmaster",
+    "auto-form:preset:tradeoff": "node scripts/automated-form-proxy.js --preset=taskmaster-tradeoff",
+    "auto-form:preset:fix-terminology": "node scripts/automated-form-proxy.js --preset=fix-terminology-all",
+    "auto-form:preset:complete-task": "node scripts/automated-form-proxy.js --preset=taskmaster-complete-current",
+    "auto-form:dry-run": "node scripts/automated-form-proxy.js --dry-run --form=taskmaster",
+    "docker:build-auto-form": "docker build -f Dockerfile.automation -t automated-form-proxy .",
+    "docker:run-auto-form": "docker run -it -v $(pwd)/config:/app/config -v $(pwd)/output:/app/output automated-form-proxy",
+    "docker:run-taskmaster": "docker run -it -v $(pwd)/config:/app/config -v $(pwd)/output:/app/output automated-form-proxy --form=taskmaster",
+    "docker:run-docs": "docker run -it -v $(pwd)/config:/app/config -v $(pwd)/docs:/app/docs automated-form-proxy --form=doc-analysis",
+    "docker:run-terminology": "docker run -it -v $(pwd)/config:/app/config -v $(pwd)/docs:/app/docs automated-form-proxy --form=terminology",
+    "docker:compose-doc-analysis": "docker-compose -f docker-compose.automation.yml run doc-analysis",
+    "docker:compose-terminology": "docker-compose -f docker-compose.automation.yml run terminology-check",
+    "docker:compose-tradeoff": "docker-compose -f docker-compose.automation.yml run taskmaster-tradeoff",
+    "docker:compose-complete": "docker-compose -f docker-compose.automation.yml run taskmaster-complete",
+    "docker:compose-doc-quality": "docker-compose -f docker-compose.automation.yml run doc-quality-check",
+    "docker:compose-implementation": "docker-compose -f docker-compose.automation.yml run implementation-setup",
+    "make-scripts-executable": "node scripts/make-scripts-executable.js",
+    "postinstall": "npm run make-scripts-executable",
+    "doc:verify-tradeoff": "node scripts/verify-tradeoff-docs.js",
+    "doc:verify-tradeoff:verbose": "node scripts/verify-tradeoff-docs.js --verbose",
+    "doc:verify-all": "npm run doc-analysis:taskmaster && npm run terminology:check && npm run doc:verify-tradeoff",
+    "docs:check-terminology": "node scripts/docs-manager.js check-terminology",
+    "docs:fix-terminology": "node scripts/docs-manager.js fix-terminology",
+    "docs:check-disconnects": "node scripts/docs-manager.js check-disconnects",
+    "docs:fix-disconnects": "node scripts/docs-manager.js fix-disconnects",
+    "docs:generate": "node scripts/docs-manager.js generate-docs",
+    "docs:manager": "node scripts/docs-manager.js help",
+    "update-github-schemas": "node scripts/update-github-actions-schema.js",
+    "lint:fix-github-actions": "npm run update-github-schemas && echo \"Now you can run your GitHub Actions workflow edits with updated schemas\""
   },
   "keywords": [
     "rules",

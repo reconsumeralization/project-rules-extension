@@ -1,0 +1,68 @@
+{
+  "canonicalTerms": {
+    "mcp": {
+      "preferred": "MCP",
+      "alternatives": ["model context protocol", "Model Context Protocol", "model-context-protocol", "Model-Context-Protocol"],
+      "definition": "Model Context Protocol - A standardized way to document critical information about AI models"
+    },
+    "taskmaster": {
+      "preferred": "Taskmaster",
+      "alternatives": ["task master", "task-master", "TaskMaster", "Task Master", "Task-Master"],
+      "definition": "The task management and automation system for development workflow"
+    },
+    "ai": {
+      "preferred": "AI",
+      "alternatives": ["artificial intelligence", "a.i.", "A.I."],
+      "definition": "Artificial Intelligence - Used for task analysis and development assistance"
+    },
+    "tradeoff-analysis": {
+      "preferred": "tradeoff analysis",
+      "alternatives": ["trade-off analysis", "trade off analysis", "tradeoffs analysis", "TradeOff Analysis"],
+      "definition": "Process of evaluating different implementation approaches based on multiple criteria"
+    },
+    "development-phase": {
+      "preferred": "development phase",
+      "alternatives": ["project phase", "workflow phase", "dev phase"],
+      "definition": "A distinct stage in the development lifecycle (planning, design, implementation, etc.)"
+    },
+    "task-breakdown": {
+      "preferred": "task breakdown",
+      "alternatives": ["task decomposition", "subtask creation", "task expansion"],
+      "definition": "Process of dividing a complex task into smaller, manageable subtasks"
+    },
+    "autonomous-mode": {
+      "preferred": "autonomous mode",
+      "alternatives": ["auto mode", "automated mode", "self-driving mode"],
+      "definition": "Operating mode where the system makes decisions with minimal human intervention"
+    },
+    "mcp-server": {
+      "preferred": "MCP server",
+      "alternatives": ["MCP-server", "model context protocol server", "protocol server"],
+      "definition": "Server that hosts MCP capabilities and AI agents for development assistance"
+    },
+    "mcp-agent": {
+      "preferred": "MCP agent",
+      "alternatives": ["AI agent", "protocol agent", "MCP-agent"],
+      "definition": "Specialized AI component that performs specific tasks within the MCP system"
+    },
+    "documentation-disconnect": {
+      "preferred": "documentation disconnect",
+      "alternatives": ["doc-code mismatch", "documentation gap", "code-doc discrepancy"],
+      "definition": "Inconsistency between what is documented and what is implemented in code"
+    }
+  },
+  "avoidTerms": [
+    "master/slave",
+    "blacklist/whitelist",
+    "dummy",
+    "crazy",
+    "sanity check"
+  ],
+  "preferredReplacements": {
+    "master/slave": "primary/secondary or leader/follower",
+    "blacklist/whitelist": "blocklist/allowlist or denied/permitted",
+    "dummy": "placeholder or sample",
+    "crazy": "unexpected or extreme",
+    "sanity check": "validation check or basic verification"
+  }
+} 

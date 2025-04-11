@@ -1,0 +1,194 @@
+{
+  "nodes": [
+    {
+      "id": "n0",
+      "name": "agentController.ts",
+      "path": "src\\controllers\\agentController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n1",
+      "name": "serverService.ts",
+      "path": "src\\services\\serverService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n2",
+      "name": "aiAutonomyController.ts",
+      "path": "src\\controllers\\aiAutonomyController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n3",
+      "name": "aiAutonomyService.ts",
+      "path": "src\\services\\aiAutonomyService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n4",
+      "name": "contextRuleController.ts",
+      "path": "src\\controllers\\contextRuleController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n5",
+      "name": "utils.ts",
+      "path": "src\\utils.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n6",
+      "name": "mcpserverController.ts",
+      "path": "src\\controllers\\mcpserverController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n7",
+      "name": "mcpAgentsView.ts",
+      "path": "src\\views\\mcpAgentsView.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n8",
+      "name": "notepadController.ts",
+      "path": "src\\controllers\\notepadController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n9",
+      "name": "ruleController.ts",
+      "path": "src\\controllers\\ruleController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n10",
+      "name": "rule.ts",
+      "path": "src\\models\\rule.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n11",
+      "name": "localStorageService.ts",
+      "path": "src\\services\\localStorageService.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n12",
+      "name": "syncController.ts",
+      "path": "src\\controllers\\syncController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n13",
+      "name": "taskController.ts",
+      "path": "src\\controllers\\taskController.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n14",
+      "name": "task.ts",
+      "path": "src\\models\\task.ts",
+      "type": "typescript",
+      "isExternal": false
+    },
+    {
+      "id": "n15",
+      "name": "taskService.ts",
+      "path": "src\\services\\taskService.ts",
+      "type": "typescript",
+      "isExternal": false
+    }
+  ],
+  "links": [
+    {
+      "source": "n0",
+      "target": "n1",
+      "isCyclic": false
+    },
+    {
+      "source": "n2",
+      "target": "n3",
+      "isCyclic": false
+    },
+    {
+      "source": "n4",
+      "target": "n1",
+      "isCyclic": false
+    },
+    {
+      "source": "n4",
+      "target": "n5",
+      "isCyclic": false
+    },
+    {
+      "source": "n6",
+      "target": "n7",
+      "isCyclic": false
+    },
+    {
+      "source": "n9",
+      "target": "n10",
+      "isCyclic": false
+    },
+    {
+      "source": "n9",
+      "target": "n1",
+      "isCyclic": false
+    },
+    {
+      "source": "n9",
+      "target": "n5",
+      "isCyclic": false
+    },
+    {
+      "source": "n9",
+      "target": "n11",
+      "isCyclic": false
+    },
+    {
+      "source": "n9",
+      "target": "n1",
+      "isCyclic": false
+    },
+    {
+      "source": "n12",
+      "target": "n10",
+      "isCyclic": false
+    },
+    {
+      "source": "n12",
+      "target": "n1",
+      "isCyclic": false
+    },
+    {
+      "source": "n12",
+      "target": "n10",
+      "isCyclic": false
+    },
+    {
+      "source": "n13",
+      "target": "n14",
+      "isCyclic": false
+    },
+    {
+      "source": "n13",
+      "target": "n15",
+      "isCyclic": false
+    }
+  ],
+  "cycles": []
+}

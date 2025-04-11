@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Taskmaster: Start Next Task",
+      "type": "shell",
+      "command": "npm run taskmaster",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Taskmaster: Auto-Start Next Task",
+      "type": "shell",
+      "command": "npm run taskmaster:auto",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Taskmaster: Complete Current Task",
+      "type": "shell",
+      "command": "npm run taskmaster:complete",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Taskmaster: Work on Specific Task",
+      "type": "shell",
+      "command": "npm run taskmaster:task=${input:taskId}",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "taskId",
+      "description": "Enter the Taskmaster task ID",
+      "default": "123",
+      "type": "promptString"
+    }
+  ]
+} 

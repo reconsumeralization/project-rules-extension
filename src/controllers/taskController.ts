@@ -177,7 +177,7 @@ export async function addOrUpdateTasks(context: vscode.ExtensionContext, tasks: 
   let updated = false
   
   for (const task of tasks) {
-    if (!task.metadata?.id) continue
+    if (!task.metadata?.id) {continue}
     
     tasksMap.set(task.metadata.id, task)
     updated = true
@@ -511,7 +511,7 @@ export class TaskController {
     const config = vscode.workspace.getConfiguration('ProjectRules.user')
     let userId = config.get<string>('identifier')
 
-    if (userId) return userId
+    if (userId) {return userId}
 
     // Fallback: Try git user email
     try {
@@ -546,4 +546,8 @@ export class TaskController {
 
     return undefined
   }
+}
+
+export function initialize(context: vscode.ExtensionContext, taskAiService: TaskAiService, taskService: TaskService) {
+  throw new Error('Function not implemented.')
 }

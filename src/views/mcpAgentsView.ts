@@ -121,7 +121,7 @@ export class McpAgentsViewProvider implements vscode.WebviewViewProvider {
    * Send the list of agents to the webview
    */
   private _sendAgentList(): void {
-    if (!this._view) return
+    if (!this._view) {return}
     
     const agents = this._agentService.getAgents()
     this._view.webview.postMessage({
@@ -134,7 +134,7 @@ export class McpAgentsViewProvider implements vscode.WebviewViewProvider {
    * Send details of a specific agent to the webview
    */
   private _sendAgentDetails(agentId: string): void {
-    if (!this._view) return
+    if (!this._view) {return}
     
     const agent = this._agentService.getAgentById(agentId)
     if (agent) {
@@ -171,21 +171,21 @@ export class McpAgentsViewProvider implements vscode.WebviewViewProvider {
       }
     )
     
-    if (!agentType) return
+    if (!agentType) {return}
     
     const agentName = await vscode.window.showInputBox({
       prompt: 'Enter agent name',
       placeHolder: 'e.g., Custom Validation Agent'
     })
     
-    if (!agentName) return
+    if (!agentName) {return}
     
     const agentDescription = await vscode.window.showInputBox({
       prompt: 'Enter agent description',
       placeHolder: 'e.g., Validates MCP against custom rules'
     })
     
-    if (!agentDescription) return
+    if (!agentDescription) {return}
     
     // Create the agent
     const newAgent = await this._agentService.createAgent({
@@ -231,7 +231,7 @@ export class McpAgentsViewProvider implements vscode.WebviewViewProvider {
       value: agent.description
     })
     
-    if (newDescription === undefined) return
+    if (newDescription === undefined) {return}
     
     const updatedAgent = await this._agentService.updateAgent(agentId, {
       description: newDescription

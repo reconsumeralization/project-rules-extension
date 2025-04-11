@@ -1,0 +1,18 @@
+{
+  "taskmaster": ["task master", "task-master", "TaskMaster", "Task Master", "Task-Master"],
+  "subtask": ["sub-task", "sub task", "SubTask", "Sub-Task", "Sub Task"],
+  "blocker": ["block", "blocking issue", "blocking task", "road-block", "roadblock"],
+  "tradeoff analysis": ["trade-off analysis", "tradeoff-analysis", "trade off analysis", "TradeOff Analysis"],
+  "mcp": ["MCP", "mcp server", "MCP Server", "mcp integration", "MCP Integration"],
+  "autonomous mode": ["auto mode", "automated mode", "autonomous-mode", "auto-mode"],
+  "phase-based": ["phase based", "Phase Based", "Phase-Based"],
+  "cli": ["CLI", "command-line", "command line", "commandline"],
+  "interactive mode": ["interactive-mode", "Interactive Mode", "Interactive-Mode"],
+  "documentation analysis": ["doc analysis", "documentation-analysis", "doc-analysis"],
+  "terminology check": ["term check", "terminology-check", "terminology checking"],
+  "enhanced taskmaster": ["enhanced-taskmaster", "Enhanced Taskmaster", "Enhanced-Taskmaster"],
+  "development phases": ["dev phases", "development-phases", "dev-phases"],
+  "implementation approach": ["implementation strategy", "implementation method", "coding approach"],
+  "progress report": ["progress-report", "status report", "progress tracking"],
+  "workflow automation": ["workflow-automation", "process automation", "automated workflow"]
+} 

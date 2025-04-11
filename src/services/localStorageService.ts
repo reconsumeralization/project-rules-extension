@@ -95,7 +95,7 @@ async function loadRulesFromDirectory(
 
   for (const fileUri of ruleFileUris) {
     const content = await readFileContent(fileUri)
-    if (content === undefined) continue // Skip if read failed
+    if (content === undefined) {continue} // Skip if read failed
 
     const filename = path.basename(fileUri.fsPath)
     // Simple check for invalid filenames (e.g., empty name before extension)
@@ -239,7 +239,7 @@ export async function readRuleContentByFilename(
     filename: string
 ): Promise<string | undefined> {
     const uri = await getRuleUri(context, filename)
-    if (!uri) return undefined
+    if (!uri) {return undefined}
     return readFileContent(uri)
 }
 
@@ -295,4 +295,12 @@ export function isUriInManagedRuleDirectory(context: vscode.ExtensionContext, ur
     }
 
     return false
+}
+
+export function initialize(context: vscode.ExtensionContext) {
+  throw new Error('Function not implemented.')
+}
+
+export function getRulesStoragePath(context: vscode.ExtensionContext) {
+  throw new Error('Function not implemented.')
 }

@@ -1,0 +1,61 @@
+name: Test Gemini API Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: "Task ID to analyze"
+        required: false
+        default: "16645323"
+      test_type:
+        description: "Type of test to run"
+        required: true
+        default: "connection"
+        type: choice
+        options:
+          - connection
+          - analyze
+          - execute
+
+jobs:
+  test-gemini:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Gemini API and mime-types
+        run: npm install @google/generative-ai mime-types --save
+
+      - name: Test API Connection
+        if: ${{ inputs.test_type == 'connection' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/test-gemini-api.js
+
+      - name: Test Task Analysis
+        if: ${{ inputs.test_type == 'analyze' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/taskmaster-gemini-proxy.js analyze ${{ inputs.task_id }}
+
+      - name: Test Code Execution
+        if: ${{ inputs.test_type == 'execute' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/taskmaster-gemini-proxy.js execute ${{ inputs.task_id }}

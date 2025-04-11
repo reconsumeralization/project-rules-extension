@@ -27,7 +27,7 @@ function extractFilePatterns(content: string): string[] {
   // NOTE: This uses basic string matching. For full glob support (like `**/*.ts`),
   // a library like 'minimatch' might be needed in the future if complex patterns become common.
   const match = content.match(/^[\*_]*Applies to:[\*_]*\s*(.+?)$/im)
-  if (!match?.[1]) return []
+  if (!match?.[1]) {return []}
 
   return match[1]
     .split(',')

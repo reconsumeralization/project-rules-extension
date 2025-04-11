@@ -92,14 +92,41 @@ Keep your team's rules consistent:
 
 ## 📊 Task Management
 
-Implement rules with trackable tasks:
+Project Rules Extension includes a task management system called Taskmaster that helps you track implementation tasks. You can:
 
-- **Create tasks** manually or with AI assistance
-- **Generate implementation tasks** from rules
-- **Estimate complexity** of implementation work using `projectRules.estimateTaskComplexity`
-- **Assign ownership** to team members
-- **Track progress** of rule implementation
-- **View tasks** globally or filtered by rule (`projectRules.showTasksForRule`)
+- View and manage tasks from within VS Code
+- Break down tasks into subtasks
+- Link tasks to rules
+- Track dependencies between tasks
+- Use AI to estimate task complexity
+
+### Taskmaster Storage System
+
+Taskmaster now includes a real storage system that replaces the simulated commands in the original implementation. This system provides:
+
+- File-based JSON storage for tasks
+- Task action logging
+- Parent-child task relationships
+- Phase-based organization
+- Command-line interface
+
+To get started with the real taskmaster implementation:
+
+```bash
+# Initialize with sample tasks
+npm run taskmaster:init
+
+# View tasks in the dashboard
+npm run taskmaster:dashboard
+
+# Work on specific task
+npm run taskmaster -- --task=<task-id>
+
+# Use the CLI tool directly
+npm run taskmaster:cli list
+```
+
+For detailed documentation on the storage system, see [docs/taskmaster/taskmaster-storage.md](docs/taskmaster/taskmaster-storage.md).
 
 ## 🧠 MCP Protocol Integration
 
@@ -418,4 +445,22 @@ To run the development server:
 
 ```bash
 npm run watch
+```
+
+## 👷 Development Workflows
+
+### GitHub Actions Compatibility
+
+This project uses the latest GitHub Actions versions in our workflows:
+
+- `actions/checkout@v4`
+- `actions/setup-node@v4`
+- `peter-evans/create-pull-request@v7`
+
+**Note**: Your local VS Code/Cursor linter might show errors for these versions. See [GitHub Actions Version Compatibility Guide](docs/developer-guide/github-actions-versions.md) for solutions.
+
+To fix linter errors for GitHub Actions:
+
+```bash
+npm run lint:fix-github-actions
 ```

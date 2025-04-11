@@ -25,7 +25,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment variables
+# Environment variables and secrets
 .env
 .env.local
 .env.development.local
@@ -41,3 +41,18 @@ Thumbs.db
 
 # Testing
 coverage 
+
+# Code Style and Analysis Reports
+style-report.json
+*-report.json
+*.backup
+format-fixes.json
+documentation-analysis.md
+docs/taskmaster/fixes/*.md
+code-analysis-results.json
+
+# Script-generated files
+/data/taskmaster/gemini-*.json
+/data/taskmaster/current-tasks.json
+gemini-payload.json
+gemini-implementation.json 

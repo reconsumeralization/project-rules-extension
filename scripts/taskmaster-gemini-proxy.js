@@ -15,6 +15,7 @@
  *   analyze <taskId>            Analyze a task with the latest Gemini model
  *   auto <taskId>               Run in autonomous mode to complete a task without user interaction
  *   auto-chat <taskId>          Run autonomous chat mode where the AI discusses a task with itself
+ *   proxy <taskId>              Run Gemini as an interactive user proxy to help complete a task
  *   help                        Show this help information
  * 
  * Examples:
@@ -23,6 +24,7 @@
  *   node taskmaster-gemini-proxy.js analyze 123456
  *   node taskmaster-gemini-proxy.js auto 123456
  *   node taskmaster-gemini-proxy.js auto-chat 123456
+ *   node taskmaster-gemini-proxy.js proxy 123456
  * 
  * Environment Variables:
  *   GEMINI_API_KEY              Required API key for Google Gemini
@@ -239,6 +241,14 @@ async function main() {
           process.exit(1);
         }
         await runAutonomousChatMode(args[1]);
+        break;
+
+      case 'proxy':
+        if (!args[1]) {
+          console.error('Error: Task ID required for user proxy mode');
+          process.exit(1);
+        }
+        await runUserProxyMode(args[1]);
         break;
 
       case 'help':
@@ -1011,6 +1021,489 @@ Format your response in markdown with clear sections.`;
 }
 
 /**
+ * Runs the user proxy mode where Gemini acts as a proxy for the user and actively helps complete tasks
+ * @param {string} taskId - The ID of the task to work on as a user proxy
+ */
+async function runUserProxyMode(taskId) {
+  console.log(`\n🧠 Starting Gemini as user proxy for task ${taskId}\n`);
+
+  try {
+    // Step 1: Fetch task details
+    const task = taskmasterStorage.getTaskById(taskId);
+    if (!task) {
+      console.error(`Error: Task with ID ${taskId} not found.`);
+      process.exit(1);
+    }
+
+    console.log(`\n📋 Working on task: ${task.title}\n`);
+    console.log(task.description);
+    console.log('------------------------------------------------------');
+
+    // Step 2: Update task status to in-progress if not already
+    if (task.status !== 'in-progress') {
+      console.log(`\n⏳ Updating task status to in-progress...`);
+      task.status = 'in-progress';
+      task.updatedAt = new Date().toISOString();
+      taskmasterStorage.updateTask(task);
+      console.log(`Task status updated to in-progress.`);
+    }
+
+    // Step 3: Analyze the task and create an execution plan
+    console.log(`\n🔍 Analyzing task and creating execution plan...`);
+
+    const planPrompt = `You are acting as a proxy for a user who needs to complete the following task:
+Title: ${task.title}
+Description: ${task.description}
+Status: ${task.status}
+Priority: ${task.priority}
+Phase: ${task.phase || 'None'}
+
+Please create a detailed execution plan that you will follow to complete this task. Include:
+1. Specific steps needed to implement the solution
+2. Required files to be created or modified
+3. Dependencies that need to be considered
+4. Testing approach to validate the solution
+
+Format your response as a structured markdown document with clear sections.`;
+
+    const executionPlan = await getGeminiResponse(
+      planPrompt,
+      undefined,
+      { temperature: 0.2, topP: 0.8, topK: 40 }
+    );
+
+    console.log(`\n✅ Execution plan created:`);
+    console.log(executionPlan);
+    console.log('------------------------------------------------------');
+
+    // Step 4: Begin interactive work session
+    console.log(`\n🧩 Beginning interactive work session...`);
+    console.log(`Type "help" to see available commands, "done" to complete the task, or "exit" to quit without completing.`);
+
+    const files = {}; // Store file contents for modifications
+    let sessionHistory = []; // Store the chat history for context
+
+    // Add the execution plan to history for context
+    sessionHistory.push({
+      role: "system",
+      content: `You are acting as a user proxy to help complete this task in the TaskMaster system: ${task.title}. You've created the following execution plan:\n\n${executionPlan}`
+    });
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: '> '
+    });
+
+    // Helper function to load file content
+    const loadFile = (filePath) => {
+      try {
+        if (!files[filePath]) {
+          // Check if file exists
+          const absolutePath = path.isAbsolute(filePath)
+            ? filePath
+            : path.join(process.cwd(), filePath);
+
+          if (fs.existsSync(absolutePath)) {
+            files[filePath] = fs.readFileSync(absolutePath, 'utf8');
+            console.log(`Loaded file: ${filePath}`);
+          } else {
+            console.log(`File does not exist: ${filePath}`);
+            return false;
+          }
+        }
+        return true;
+      } catch (error) {
+        console.error(`Error loading file ${filePath}:`, error.message);
+        return false;
+      }
+    };
+
+    // Helper function to save file content
+    const saveFile = (filePath, content) => {
+      try {
+        const absolutePath = path.isAbsolute(filePath)
+          ? filePath
+          : path.join(process.cwd(), filePath);
+
+        // Ensure directory exists
+        const dir = path.dirname(absolutePath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+
+        fs.writeFileSync(absolutePath, content);
+        files[filePath] = content;
+        console.log(`Saved file: ${filePath}`);
+        return true;
+      } catch (error) {
+        console.error(`Error saving file ${filePath}:`, error.message);
+        return false;
+      }
+    };
+
+    // Simulate running a command
+    const runCommand = async (command) => {
+      try {
+        console.log(`Running command: ${command}`);
+        const { execSync } = require('child_process');
+        const output = execSync(command, { encoding: 'utf8' });
+        console.log(output);
+        return output;
+      } catch (error) {
+        console.error(`Error running command: ${error.message}`);
+        return error.message;
+      }
+    };
+
+    // Process user commands
+    const processCommand = async (input) => {
+      const parts = input.trim().split(' ');
+      const cmd = parts[0].toLowerCase();
+
+      switch (cmd) {
+        case 'help':
+          console.log(`
+Available commands:
+  help                          Show this help message
+  load <filepath>               Load a file into memory
+  edit <filepath>               Let Gemini suggest edits for a file
+  view <filepath>               View the content of a loaded file
+  save <filepath>               Save changes to a file
+  run <command>                 Run a shell command and show output
+  explain                       Ask Gemini to explain the current task
+  suggest                       Ask Gemini for suggestions on next steps
+  implement                     Ask Gemini to implement the current step
+  test                          Ask Gemini to suggest tests for the implementation
+  done                          Mark the task as completed and exit
+  exit                          Exit without completing the task
+          `);
+          return true;
+
+        case 'load':
+          if (parts.length < 2) {
+            console.log('Usage: load <filepath>');
+            return true;
+          }
+          loadFile(parts[1]);
+          return true;
+
+        case 'view':
+          if (parts.length < 2) {
+            console.log('Usage: view <filepath>');
+            return true;
+          }
+          if (loadFile(parts[1])) {
+            console.log(`\nContent of ${parts[1]}:\n`);
+            console.log(files[parts[1]]);
+          }
+          return true;
+
+        case 'edit':
+          if (parts.length < 2) {
+            console.log('Usage: edit <filepath>');
+            return true;
+          }
+
+          const filepath = parts[1];
+          if (!loadFile(filepath)) {
+            // If file doesn't exist, ask if we should create it
+            const createPrompt = await new Promise(resolve => {
+              rl.question(`File ${filepath} doesn't exist. Create it? (y/n): `, answer => {
+                resolve(answer.toLowerCase());
+              });
+            });
+
+            if (createPrompt !== 'y' && createPrompt !== 'yes') {
+              return true;
+            }
+
+            files[filepath] = '';
+          }
+
+          // Generate edits using Gemini
+          console.log(`Asking Gemini to suggest edits for ${filepath}...`);
+
+          const editPrompt = `You are editing the file ${filepath} as part of implementing this task: ${task.title}.
+${task.description}
+
+Current content of the file:
+\`\`\`
+${files[filepath] || 'This is a new file.'}
+\`\`\`
+
+Please suggest the complete edited content for this file. Provide the entire file content, not just the changes.
+If this is a new file, please create appropriate content based on the task requirements.
+Consider the best practices for the file type and ensure the implementation follows good coding standards.`;
+
+          sessionHistory.push({ role: "user", content: editPrompt });
+
+          const editedContent = await getGeminiResponse(
+            editPrompt,
+            undefined,
+            { temperature: 0.2, topP: 0.8, maxOutputTokens: 8000 }
+          );
+
+          sessionHistory.push({ role: "assistant", content: editedContent });
+
+          // Extract code from markdown if present
+          let newContent = editedContent;
+          const codeBlockMatch = editedContent.match(/```(?:[\w-]+)?\n([\s\S]+?)```/);
+          if (codeBlockMatch && codeBlockMatch[1]) {
+            newContent = codeBlockMatch[1];
+          }
+
+          console.log(`\nSuggested edits for ${filepath}:`);
+          console.log('------------------------------------------------------');
+          console.log(newContent);
+          console.log('------------------------------------------------------');
+
+          const savePrompt = await new Promise(resolve => {
+            rl.question('Save these changes? (y/n): ', answer => {
+              resolve(answer.toLowerCase());
+            });
+          });
+
+          if (savePrompt === 'y' || savePrompt === 'yes') {
+            saveFile(filepath, newContent);
+          }
+          return true;
+
+        case 'save':
+          if (parts.length < 2) {
+            console.log('Usage: save <filepath>');
+            return true;
+          }
+
+          if (!files[parts[1]]) {
+            console.log(`File ${parts[1]} not loaded. Use 'load' command first.`);
+            return true;
+          }
+
+          saveFile(parts[1], files[parts[1]]);
+          return true;
+
+        case 'run':
+          if (parts.length < 2) {
+            console.log('Usage: run <command>');
+            return true;
+          }
+
+          const commandToRun = parts.slice(1).join(' ');
+          await runCommand(commandToRun);
+          return true;
+
+        case 'explain':
+          console.log(`Asking Gemini to explain the current task...`);
+
+          const explainPrompt = `Please explain the following task in detail, breaking down what needs to be done:
+          
+Title: ${task.title}
+Description: ${task.description}
+Status: ${task.status}
+Priority: ${task.priority}
+Phase: ${task.phase || 'None'}
+
+Please be specific about what steps need to be taken.`;
+
+          sessionHistory.push({ role: "user", content: explainPrompt });
+
+          const explanation = await getGeminiResponse(
+            explainPrompt,
+            undefined,
+            { temperature: 0.3, topP: 0.8, topK: 40 }
+          );
+
+          sessionHistory.push({ role: "assistant", content: explanation });
+
+          console.log('\nTask explanation:');
+          console.log('------------------------------------------------------');
+          console.log(explanation);
+          console.log('------------------------------------------------------');
+          return true;
+
+        case 'suggest':
+          console.log(`Asking Gemini for suggestions on next steps...`);
+
+          const suggestPrompt = `Based on the current state of implementing this task:
+          
+Title: ${task.title}
+Description: ${task.description}
+
+Please suggest the next 2-3 concrete steps I should take to move forward with this task.
+Be specific about what files to modify and what changes to make.`;
+
+          sessionHistory.push({ role: "user", content: suggestPrompt });
+
+          const suggestions = await getGeminiResponse(
+            suggestPrompt,
+            undefined,
+            { temperature: 0.3, topP: 0.8, topK: 40 }
+          );
+
+          sessionHistory.push({ role: "assistant", content: suggestions });
+
+          console.log('\nSuggested next steps:');
+          console.log('------------------------------------------------------');
+          console.log(suggestions);
+          console.log('------------------------------------------------------');
+          return true;
+
+        case 'implement':
+          console.log(`Asking Gemini to implement the current step...`);
+
+          const implementPrompt = `Please implement the next step for this task:
+          
+Title: ${task.title}
+Description: ${task.description}
+
+Provide concrete implementation details, including specific code changes, file paths, 
+and any commands that need to be run.`;
+
+          sessionHistory.push({ role: "user", content: implementPrompt });
+
+          const implementation = await getGeminiResponse(
+            implementPrompt,
+            undefined,
+            { temperature: 0.2, topP: 0.8, maxOutputTokens: 8000 }
+          );
+
+          sessionHistory.push({ role: "assistant", content: implementation });
+
+          console.log('\nImplementation suggestion:');
+          console.log('------------------------------------------------------');
+          console.log(implementation);
+          console.log('------------------------------------------------------');
+          return true;
+
+        case 'test':
+          console.log(`Asking Gemini to suggest tests for the implementation...`);
+
+          const testPrompt = `For the current implementation of this task:
+          
+Title: ${task.title}
+Description: ${task.description}
+
+Please suggest tests to verify the implementation is correct. Include:
+1. What should be tested
+2. How to test it (manual steps or automated test code)
+3. Expected outcomes for each test
+
+Be specific about what needs to be tested and how to confirm it works correctly.`;
+
+          sessionHistory.push({ role: "user", content: testPrompt });
+
+          const testSuggestions = await getGeminiResponse(
+            testPrompt,
+            undefined,
+            { temperature: 0.3, topP: 0.8, topK: 40 }
+          );
+
+          sessionHistory.push({ role: "assistant", content: testSuggestions });
+
+          console.log('\nTest suggestions:');
+          console.log('------------------------------------------------------');
+          console.log(testSuggestions);
+          console.log('------------------------------------------------------');
+          return true;
+
+        case 'done':
+          // Update task status to completed
+          console.log(`\n✅ Marking task as completed...`);
+
+          // Generate completion report
+          const reportPrompt = `Please create a completion report for this task:
+          
+Title: ${task.title}
+Description: ${task.description}
+
+Include:
+1. Summary of what was implemented
+2. List of modified files and what changes were made
+3. Notes on testing that was performed
+4. Any future considerations or follow-up tasks
+
+Format your response as a markdown document with clear sections.`;
+
+          const completionReport = await getGeminiResponse(
+            reportPrompt,
+            undefined,
+            { temperature: 0.3, topP: 0.8, topK: 40 }
+          );
+
+          console.log('\nCompletion report:');
+          console.log('------------------------------------------------------');
+          console.log(completionReport);
+          console.log('------------------------------------------------------');
+
+          // Save completion report
+          const taskDir = path.join(process.cwd(), 'tasks', `task-${taskId}`);
+          if (!fs.existsSync(taskDir)) {
+            fs.mkdirSync(taskDir, { recursive: true });
+          }
+
+          const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '');
+          fs.writeFileSync(
+            path.join(taskDir, `completion-report-${timestamp}.md`),
+            completionReport
+          );
+
+          // Update task status
+          task.status = 'completed';
+          task.completedAt = new Date().toISOString();
+          taskmasterStorage.updateTask(task);
+
+          console.log(`Task status updated to completed.`);
+          console.log(`\n🎉 Task completed successfully!`);
+          return false; // Exit the loop
+
+        case 'exit':
+          console.log(`\nExiting without completing the task. Task status remains ${task.status}.`);
+          return false; // Exit the loop
+
+        default:
+          // Treat as a direct question to Gemini
+          console.log(`Sending your question to Gemini...`);
+
+          sessionHistory.push({ role: "user", content: input });
+
+          const response = await getGeminiResponse(
+            input,
+            undefined,
+            { temperature: 0.5, topP: 0.9, topK: 50 }
+          );
+
+          sessionHistory.push({ role: "assistant", content: response });
+
+          console.log('\nGemini response:');
+          console.log('------------------------------------------------------');
+          console.log(response);
+          console.log('------------------------------------------------------');
+          return true;
+      }
+    };
+
+    // Main interaction loop
+    let continueLoop = true;
+    while (continueLoop) {
+      const input = await new Promise(resolve => {
+        rl.question('> ', answer => {
+          resolve(answer.trim());
+        });
+      });
+
+      continueLoop = await processCommand(input);
+    }
+
+    rl.close();
+
+  } catch (error) {
+    console.error(`Error in user proxy mode: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+/**
  * Display help information
  */
 function showHelp() {
@@ -1026,6 +1519,7 @@ Commands:
   analyze <task_id> - Ask the AI to analyze a task
   auto <task_id> - Run autonomous mode where the AI will analyze, implement and complete a task without user interaction
   auto-chat <task_id> - Run autonomous chat mode where the AI discusses a task with itself
+  proxy <task_id> - Run Gemini as an interactive user proxy to help complete a task
   help - Show this help message
 
 Examples:
@@ -1034,6 +1528,7 @@ Examples:
   node taskmaster-gemini-proxy.js analyze 123456
   node taskmaster-gemini-proxy.js auto 123456
   node taskmaster-gemini-proxy.js auto-chat 123456
+  node taskmaster-gemini-proxy.js proxy 123456
 
 Environment Variables:
   GEMINI_API_KEY              Required API key for Google Gemini

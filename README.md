@@ -14,6 +14,60 @@
 - 📊 **Task Management** - Create and track implementation tasks for rules
 - 🧠 **MCP Protocol** - Advanced AI model context protocol management
 
+## TypeScript Event Handlers
+
+The extension provides a standardized event handler system to work with different event sources:
+
+### Generic Event Interface
+
+```typescript
+interface NormalizedEvent<T = any> {
+  type: string;
+  target: T;
+  currentTarget: T;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  timestamp: number;
+
+  // Methods
+  preventDefault(): void;
+  stopPropagation(): void;
+  stopImmediatePropagation(): void;
+
+  // Original event reference
+  originalEvent?: unknown;
+}
+```
+
+### Event Adapters
+
+Convert events from different sources to the standardized format:
+
+```typescript
+// For React events
+const normalizedEvent = fromReactEvent(reactEvent);
+
+// For VSCode events
+const normalizedEvent = fromVSCodeEvent(vscodeEvent);
+```
+
+### Enhanced Event Handlers
+
+Create handlers that work seamlessly with any event source:
+
+```typescript
+const handleChange = createEnhancedHandler<string>(value => {
+  setState(value);
+});
+
+// Works with React events
+<input onChange={handleChange} />
+
+// Works with VSCode WebView events
+vscode.postMessage({ value: 'some value' }, handleChange);
+```
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -53,6 +107,7 @@ Create custom rules in `.mdc` files that define coding standards, architectural 
   category: Formatting
   severity: Warning
   ---
+
   # Rule Title
 
   Rule description using standard markdown...
@@ -133,6 +188,7 @@ For detailed documentation on the storage system, see [docs/taskmaster/taskmaste
 Advanced AI model context management:
 
 - **MCP Editor** for creating standardized AI context protocols
+
   - Design structured context protocols with dedicated editor
   - Define parameters, capabilities, and limitations for AI models
   - Use markdown-based format with specialized validation
@@ -140,6 +196,7 @@ Advanced AI model context management:
   - Version and track changes to protocols over time
 
 - **Agent Management** for monitoring AI assistants
+
   - Register and configure AI agents with the MCP server
   - Control agent activation state (active/inactive/paused)
   - Define agent roles and permissions within your project
@@ -147,6 +204,7 @@ Advanced AI model context management:
   - View agent execution logs and action history
 
 - **Protocol Validation** to ensure consistency
+
   - Automatic validation against MCP schema
   - Detect missing or inconsistent parameters
   - Ensure proper formatting and structure
@@ -154,6 +212,7 @@ Advanced AI model context management:
   - Suggestions for improving protocol effectiveness
 
 - **Agent Statistics** for tracking performance
+
   - Monitor processing time and resource usage
   - Track suggestion quality and acceptance rate
   - Measure agent productivity and contribution
@@ -172,6 +231,7 @@ Advanced AI model context management:
 The Enhanced Taskmaster workflow provides a comprehensive development management system:
 
 - **Phase-Based Development** with specialized AI agents:
+
   - Planning phase with Protocol Validator Agent
   - Design phase with Integration Assistant Agent
   - Implementation phase with Integration Assistant Agent
@@ -180,6 +240,7 @@ The Enhanced Taskmaster workflow provides a comprehensive development management
   - Deployment phase with Monitoring & Analytics Agent
 
 - **AI-Driven Task Breakdown**:
+
   - Automatically analyze complex tasks
   - Generate logical subtasks with proper dependencies
   - Estimate complexity and effort for each subtask
@@ -192,8 +253,8 @@ The Enhanced Taskmaster workflow provides a comprehensive development management
   - Calculate complexity, risk, and time requirements
   - Document decisions with comprehensive rationale
   - Reference for future architectural decisions
-  
 - **MCP Server Integration**:
+
   - Connect to specialized AI agents for different development phases
   - Enhance analysis capabilities with Protocol Enhancement Agent
   - Validate implementations against standardized protocols
@@ -209,21 +270,21 @@ The Enhanced Taskmaster workflow provides a comprehensive development management
 
 ### Taskmaster Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run taskmaster:enhanced` | Run enhanced Taskmaster in interactive mode |
-| `npm run taskmaster:phase-planning` | Run Taskmaster in planning phase |
-| `npm run taskmaster:phase-design` | Run Taskmaster in design phase |
-| `npm run taskmaster:phase-implementation` | Run Taskmaster in implementation phase |
-| `npm run taskmaster:phase-testing` | Run Taskmaster in testing phase |
-| `npm run taskmaster:phase-review` | Run Taskmaster in review phase |
-| `npm run taskmaster:phase-deployment` | Run Taskmaster in deployment phase |
-| `npm run taskmaster:analyze` | Analyze and break down tasks |
-| `npm run taskmaster:mcp` | Enable MCP server integration |
-| `npm run taskmaster:progress` | Generate phase-based progress report |
-| `npm run taskmaster:tradeoff` | Perform tradeoff analysis for approaches |
-| `npm run taskmaster:tradeoff-task` | Run tradeoff analysis for specific task |
-| `npm run taskmaster:tradeoff-mcp` | Use MCP integration for tradeoff analysis |
+| Command                                   | Description                                 |
+| ----------------------------------------- | ------------------------------------------- |
+| `npm run taskmaster:enhanced`             | Run enhanced Taskmaster in interactive mode |
+| `npm run taskmaster:phase-planning`       | Run Taskmaster in planning phase            |
+| `npm run taskmaster:phase-design`         | Run Taskmaster in design phase              |
+| `npm run taskmaster:phase-implementation` | Run Taskmaster in implementation phase      |
+| `npm run taskmaster:phase-testing`        | Run Taskmaster in testing phase             |
+| `npm run taskmaster:phase-review`         | Run Taskmaster in review phase              |
+| `npm run taskmaster:phase-deployment`     | Run Taskmaster in deployment phase          |
+| `npm run taskmaster:analyze`              | Analyze and break down tasks                |
+| `npm run taskmaster:mcp`                  | Enable MCP server integration               |
+| `npm run taskmaster:progress`             | Generate phase-based progress report        |
+| `npm run taskmaster:tradeoff`             | Perform tradeoff analysis for approaches    |
+| `npm run taskmaster:tradeoff-task`        | Run tradeoff analysis for specific task     |
+| `npm run taskmaster:tradeoff-mcp`         | Use MCP integration for tradeoff analysis   |
 
 ## ✨ Visual Examples
 
@@ -233,69 +294,69 @@ The Enhanced Taskmaster workflow provides a comprehensive development management
 
 ### Rule Management
 
-| Command | Description |
-|---------|-------------|
-| `projectRules.createRule` | Create a new rule with a template |
-| `projectRules.generateRuleFromFile` | Generate a rule from the current file |
-| `projectRules.suggestRuleImprovements` | Get AI suggestions for a rule |
-| `projectRules.previewSuggestion` | Preview an AI-suggested rule change |
-| `projectRules.approveSuggestedRule` | Approve an AI suggestion |
-| `projectRules.dismissSuggestedRule` | Dismiss an AI suggestion |
+| Command                                | Description                           |
+| -------------------------------------- | ------------------------------------- |
+| `projectRules.createRule`              | Create a new rule with a template     |
+| `projectRules.generateRuleFromFile`    | Generate a rule from the current file |
+| `projectRules.suggestRuleImprovements` | Get AI suggestions for a rule         |
+| `projectRules.previewSuggestion`       | Preview an AI-suggested rule change   |
+| `projectRules.approveSuggestedRule`    | Approve an AI suggestion              |
+| `projectRules.dismissSuggestedRule`    | Dismiss an AI suggestion              |
 
 ### Synchronization
 
-| Command | Description |
-|---------|-------------|
-| `projectRules.syncRules` | Synchronize rules with the server |
-| `projectRules.fetchServerChanges` | Download latest rules from server |
-| `projectRules.createTask` | Create a new task manually |
-| `projectRules.createTaskWithAI` | Create a task using AI |
-| `projectRules.generateTasksForRule` | Generate tasks for implementing a rule |
-| `projectRules.showTasks` | Show the tasks view |
-| `projectRules.showTasksForRule` | Show tasks associated with a specific rule |
-| `projectRules.estimateTaskComplexity` | Estimate complexity for a selected task |
-| `projectRules.assignTaskToMe` | Assign a task to yourself |
+| Command                               | Description                                |
+| ------------------------------------- | ------------------------------------------ |
+| `projectRules.syncRules`              | Synchronize rules with the server          |
+| `projectRules.fetchServerChanges`     | Download latest rules from server          |
+| `projectRules.createTask`             | Create a new task manually                 |
+| `projectRules.createTaskWithAI`       | Create a task using AI                     |
+| `projectRules.generateTasksForRule`   | Generate tasks for implementing a rule     |
+| `projectRules.showTasks`              | Show the tasks view                        |
+| `projectRules.showTasksForRule`       | Show tasks associated with a specific rule |
+| `projectRules.estimateTaskComplexity` | Estimate complexity for a selected task    |
+| `projectRules.assignTaskToMe`         | Assign a task to yourself                  |
 
 ### MCP Management
 
-| Command | Description |
-|---------|-------------|
-| `projectRules.openMcpAgentsView` | Show MCP Server Agents |
-| `projectRules.refreshMcpAgents` | Refresh agent list |
-| `projectRules.refreshAgentStats` | Update statistics for a single agent |
-| `projectRules.refreshAllAgentStats` | Refresh statistics for all agents |
+| Command                             | Description                          |
+| ----------------------------------- | ------------------------------------ |
+| `projectRules.openMcpAgentsView`    | Show MCP Server Agents               |
+| `projectRules.refreshMcpAgents`     | Refresh agent list                   |
+| `projectRules.refreshAgentStats`    | Update statistics for a single agent |
+| `projectRules.refreshAllAgentStats` | Refresh statistics for all agents    |
 
 ### AI Autonomy
 
-| Command | Description |
-|---------|-------------|
-| `projectRules.toggleAiAutonomy` | Toggle AI autonomy on/off |
-| `projectRules.triggerAiCycle` | Manually trigger AI analysis cycle |
+| Command                         | Description                        |
+| ------------------------------- | ---------------------------------- |
+| `projectRules.toggleAiAutonomy` | Toggle AI autonomy on/off          |
+| `projectRules.triggerAiCycle`   | Manually trigger AI analysis cycle |
 
 ## ⚙️ Configuration
 
 ### Server Settings
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `projectRules.serverUrl` | URL of the Project Rules server | `http://localhost:3000` |
-| `projectRules.authToken` | Authentication token for the server API | `` |
-| `projectRules.syncInterval` | Background sync interval in seconds | `300` |
+| Setting                     | Description                             | Default                 |
+| --------------------------- | --------------------------------------- | ----------------------- |
+| `projectRules.serverUrl`    | URL of the Project Rules server         | `http://localhost:3000` |
+| `projectRules.authToken`    | Authentication token for the server API | ``                      |
+| `projectRules.syncInterval` | Background sync interval in seconds     | `300`                   |
 
 ### MCP Agent Settings
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `projectRules.mcpAgents.autoRefreshOnFocus` | Auto-refresh agent stats on window focus | `true` |
+| Setting                                     | Description                              | Default |
+| ------------------------------------------- | ---------------------------------------- | ------- |
+| `projectRules.mcpAgents.autoRefreshOnFocus` | Auto-refresh agent stats on window focus | `true`  |
 
 ### AI Settings
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `projectRules.ai.apiKey` | API Key for the AI service | `` |
-| `projectRules.ai.context.maxFileChars` | Max characters from a file before summarization | `2000` |
-| `projectRules.ai.context.enableSummarization` | Enable AI-powered summarization | `true` |
-| `projectRules.ai.context.maxFiles` | Max number of files to include in AI context | `5` |
+| Setting                                       | Description                                     | Default |
+| --------------------------------------------- | ----------------------------------------------- | ------- |
+| `projectRules.ai.apiKey`                      | API Key for the AI service                      | ``      |
+| `projectRules.ai.context.maxFileChars`        | Max characters from a file before summarization | `2000`  |
+| `projectRules.ai.context.enableSummarization` | Enable AI-powered summarization                 | `true`  |
+| `projectRules.ai.context.maxFiles`            | Max number of files to include in AI context    | `5`     |
 
 ## 🔧 Architecture
 
@@ -315,30 +376,30 @@ To contribute or run the extension locally:
 
 1. **Clone the repository:**
 
-    ```bash
-    git clone https://github.com/reconsumeralization/project-rules-extension.git
-    cd project-rules-extension
-    ```
+   ```bash
+   git clone https://github.com/reconsumeralization/project-rules-extension.git
+   cd project-rules-extension
+   ```
 
 2. **Install dependencies:**
 
-    ```bash
-    npm install
-    # or yarn install
-    ```
+   ```bash
+   npm install
+   # or yarn install
+   ```
 
 3. **Build the extension:**
 
-    ```bash
-    npm run compile
-    # or yarn compile (or specific build script)
-    ```
+   ```bash
+   npm run compile
+   # or yarn compile (or specific build script)
+   ```
 
 4. **Open in VS Code:**
 
-    ```bash
-    code .
-    ```
+   ```bash
+   code .
+   ```
 
 5. **Run the extension:** Press `F5` to open a new Extension Development Host window with the extension loaded.
 
@@ -353,7 +414,7 @@ This extension uses webpack for bundling both the Node.js extension code and bro
 
 ### Testing
 
-*(Placeholder: Describe the testing strategy - unit tests, integration tests, e2e tests. Mention commands like `npm test` or `yarn test`)*
+_(Placeholder: Describe the testing strategy - unit tests, integration tests, e2e tests. Mention commands like `npm test` or `yarn test`)_
 
 ## 🤝 Contributing
 

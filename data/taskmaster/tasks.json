@@ -3,13 +3,13 @@
     "id": "16645323",
     "title": "Implement TypeScript event handlers",
     "description": "Add TypeScript interface for event handlers to improve type safety and developer experience.",
-    "status": "in-progress",
+    "status": "completed",
     "priority": "high",
     "parentId": null,
     "phase": "implementation",
     "createdAt": 1744331095253,
-    "updatedAt": 1744331095263,
-    "completedAt": null
+    "updatedAt": 1744337010841,
+    "completedAt": 1744337010841
   },
   {
     "id": "f153228d",

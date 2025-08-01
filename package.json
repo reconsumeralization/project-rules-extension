@@ -301,7 +301,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
-    "@vscode/codicons": "^0.0.35",
+    "@vscode/codicons": "^0.0.39",
     "dotenv": "^16.5.0",
     "mime-types": "^3.0.1"
   },

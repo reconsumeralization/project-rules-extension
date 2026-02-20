@@ -327,7 +327,7 @@
     "css-loader": "^6.8.1",
     "eslint": "^9.24.0",
     "file-loader": "^6.2.0",
-    "glob": "^11.0.1",
+    "glob": "^13.0.6",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.487.0",
     "mocha": "^11.1.0",

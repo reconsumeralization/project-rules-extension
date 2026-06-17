@@ -306,8 +306,8 @@
     "mime-types": "^3.0.1"
   },
   "devDependencies": {
-    "@babel/parser": "^7.27.0",
-    "@babel/traverse": "^7.27.0",
+    "@babel/parser": "^8.0.0",
+    "@babel/traverse": "^8.0.0",
     "@eslint/js": "^9.24.0",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-dropdown-menu": "^2.1.7",

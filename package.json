@@ -343,7 +343,7 @@
     "vaul": "^1.1.2",
     "webpack": "^5.99.5",
     "webpack-cli": "^6.0.1",
-    "yaml-language-server": "^1.17.0"
+    "yaml-language-server": "^2.0.0"
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
